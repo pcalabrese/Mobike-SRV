@@ -6,7 +6,7 @@ import persistence.exception.PersistenceException;
 public interface FacadePath{
 
 
-	public boolean savePerson(Path path) throws PersistenceException;
-	public Path searchPerson(Long id) throws PersistenceException;
+	public boolean savePath(Path path) throws PersistenceException;
+	public Path searchPath(Long id) throws PersistenceException;
 }
 

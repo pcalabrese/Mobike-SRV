@@ -5,13 +5,13 @@ import java.util.Date;
 
 public class Path {
 	
-	private int id;
+	private long pathId;
 	private String name;
 	private String description;
 	private double length;
 	private Duration duration;
 	private Date uploadTime;
-	private int userId;
+	private long userId;
 	
 	public Path(){
 		super();
@@ -19,7 +19,7 @@ public class Path {
 	
 	public Path(int id, String name){
 		super();
-		this.id = id;
+		this.pathId = id;
 		this.name = name;
 	}
 	
@@ -34,7 +34,7 @@ public class Path {
 	public Path(int id, String name, String description, double length,
 			Duration duration, Date uploadTime) {
 		super();
-		this.id = id;
+		this.pathId = id;
 		this.name = name;
 		this.description = description;
 		this.length = length;
@@ -45,15 +45,15 @@ public class Path {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return id;
+	public long getId() {
+		return pathId;
 	}
 	
 	/**
 	 * @param id the id to set
 	 */
 	public void setId(int id) {
-		this.id = id;
+		this.pathId = id;
 	}
 	
 	/**
@@ -129,7 +129,7 @@ public class Path {
 	/**
 	 * @return the owner userId 
 	 */
-	public int getUserId() {
+	public long getUserId() {
 		return userId;
 	}
 

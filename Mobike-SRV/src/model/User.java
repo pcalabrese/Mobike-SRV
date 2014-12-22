@@ -16,7 +16,7 @@ public class User {
 	 */
 	
 
-	private int Id;
+	private long userId;
 	private String name;
 	private String surname;
 	private String username;
@@ -27,7 +27,7 @@ public class User {
 	
 	public User(int id) {
 		super();
-		this.Id = id;
+		this.userId = id;
 	}
 	
 	/**
@@ -137,15 +137,15 @@ public class User {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
-		return Id;
+	public long getId() {
+		return userId;
 	}
 	
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
-		Id = id;
+	public void setId(long id) {
+		userId = id;
 	}
 	
 	
