@@ -68,7 +68,7 @@ public class PathDAO implements PathRepository{
 
 
 	@Override
-	public boolean addPath(Path p) {
+	public void addPath(Path p) throws PersistenceException {
 		try{
 			em.getTransaction().begin();
 			em.persist(p);

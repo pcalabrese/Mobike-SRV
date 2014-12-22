@@ -7,7 +7,7 @@ import model.Path;
 
 	public class FacadePathImpl implements FacadePath {
 		
-		public boolean savePath(Path path) throws PersistenceException {
+		public void savePath(Path path) throws PersistenceException {
 			PathRepository pathREP = new PathDAO();
 			try{
 			return pathREP.addPath(path);
