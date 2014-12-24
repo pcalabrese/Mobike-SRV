@@ -12,6 +12,7 @@ public class Path {
 	private Duration duration;
 	private Date uploadTime;
 	private long userId;
+	private String link;
 	
 	public Path(){
 		super();
@@ -136,8 +137,22 @@ public class Path {
 	/**
 	 * @param userId the owner userId to set
 	 */
-	public void setUserId(int userId) {
+	public void setUserId(long userId) {
 		this.userId = userId;
+	}
+
+	/**
+	 * @return the link
+	 */
+	public String getLink() {
+		return link;
+	}
+
+	/**
+	 * @param link the link to set
+	 */
+	public void setLink(String link) {
+		this.link = link;
 	}
 	
 	

@@ -2,8 +2,6 @@ package persistence.exception;
 
 public class PersistenceException extends Exception {
 
-//	private String message;
-
 	private static final long serialVersionUID = 1L;
 
 	public PersistenceException(){
@@ -12,7 +10,13 @@ public class PersistenceException extends Exception {
 	
 	public PersistenceException(String message) {
 		super(message);
-//		this.message = message;
+	}
+	
+	public PersistenceException(Exception source){
+		super(source);
 	}
 
+	public PersistenceException(String message, Exception source){
+		super(message,source);
+	}
 }

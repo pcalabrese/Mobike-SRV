@@ -1,24 +1,21 @@
-package persistence.DAO;
+package persistence.mysql;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import model.Path;
-import model.PathRepository;
-
+import persistence.PathRepository;
 import javax.persistence.*;
-
 import persistence.jpa.SingletonEMF;
 
-public class PathDAO implements PathRepository{
+public class PathMySQL implements PathRepository{
 
 	private EntityManagerFactory emf = SingletonEMF.get();
 	private EntityManager em = emf.createEntityManager();
 	
-	public PathDAO() {}
+	public PathMySQL() {}
 	
 	
 	
@@ -26,7 +23,6 @@ public class PathDAO implements PathRepository{
 	public Path pathFromId(long id){
 		
 		Path autore = null;
-		
 		Query query = em.createQuery("select a from Autore a where a.cod=:codAutore");
 		query.setParameter("idPath",id);
 		autore =(Path) query.getSingleResult();
@@ -42,11 +38,8 @@ public class PathDAO implements PathRepository{
 	public List<Path> allPath() {
 		
 		List<Path> paths = new ArrayList<Path>();
-		
 		Query query = em.createQuery("select p from Path p");
-		
 		paths =query.getResultList();
-		
 		return paths;
 	}
 

@@ -1,7 +1,8 @@
-package model;
+package persistence;
 
 import java.util.List;
 
+import model.Path;
 import persistence.exception.PersistenceException;
 
 public interface PathRepository {
