@@ -1,8 +1,6 @@
 package facade;
 
-import java.time.Duration;
 import java.util.List;
-
 import persistence.PathRepository;
 import persistence.exception.*;
 import persistence.mysql.PathMySQL;
@@ -17,7 +15,7 @@ import model.Path;
 		}
 		
 		@Override
-		public void addPath(String name, String description, String url,int length, Duration duration, long userId) {
+		public void addPath(String name, String description, String url,int length, long duration, long userId) {
 			
 			try{
 			 Path path = new Path();
@@ -25,7 +23,7 @@ import model.Path;
 			 path.setDescription(description);
 			 path.setLength(length);
 			 path.setDuration(duration);
-			 path.setLink(url);
+			 path.setUrl(url);
 			 /*settare id? come settare userId?  */
 			 
 			 pathRep.addPath(path);

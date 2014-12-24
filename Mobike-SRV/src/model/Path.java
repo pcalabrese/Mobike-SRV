@@ -1,162 +1,109 @@
 package model;
 
-import java.time.Duration;
+import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Date;
 
-public class Path {
-	
-	private long pathId;
-	private String name;
+
+/**
+ * The persistent class for the paths database table.
+ * 
+ */
+@Entity
+@Table(name="paths")
+@NamedQuery(name="Path.findAll", query="SELECT p FROM Path p")
+public class Path implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(unique=true, nullable=false)
+	private long id;
+
+	@Column(nullable=false)
+	private long creatorId;
+
+	@Column(nullable=false, length=160)
 	private String description;
-	private double length;
-	private Duration duration;
-	private Date uploadTime;
-	private long userId;
-	private String link;
-	
-	public Path(){
-		super();
-	}
-	
-	public Path(int id, String name){
-		super();
-		this.pathId = id;
-		this.name = name;
-	}
-	
-	/**
-	 * @param id
-	 * @param name
-	 * @param description
-	 * @param length
-	 * @param duration
-	 * @param uploadTime
-	 */
-	public Path(int id, String name, String description, double length,
-			Duration duration, Date uploadTime) {
-		super();
-		this.pathId = id;
-		this.name = name;
-		this.description = description;
-		this.length = length;
-		this.duration = duration;
-		this.uploadTime = uploadTime;
+
+	private long duration;
+
+	private int length;
+
+	@Column(nullable=false, length=50)
+	private String name;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date uploadDate;
+
+	@Column(nullable=false, length=160)
+	private String url;
+
+	public Path() {
 	}
 
-	/**
-	 * @return the id
-	 */
 	public long getId() {
-		return pathId;
-	}
-	
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(int id) {
-		this.pathId = id;
-	}
-	
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+		return this.id;
 	}
 
-	/**
-	 * @return the description
-	 */
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public long getCreatorId() {
+		return this.creatorId;
+	}
+
+	public void setCreatorId(long creatorId) {
+		this.creatorId = creatorId;
+	}
+
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
-	/**
-	 * @param description the description to set
-	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * @return the length
-	 */
-	public double getLength() {
-		return length;
+	public long getDuration() {
+		return this.duration;
 	}
 
-	/**
-	 * @param length the length to set
-	 */
-	public void setLength(double length) {
-		this.length = length;
-	}
-
-	/**
-	 * @return the duration
-	 */
-	public Duration getDuration() {
-		return duration;
-	}
-
-	/**
-	 * @param duration the duration to set
-	 */
-	public void setDuration(Duration duration) {
+	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 
-	/**
-	 * @return the upload Time
-	 */
-	public Date getUploadTime() {
-		return uploadTime;
+	public int getLength() {
+		return this.length;
 	}
 
-	/**
-	 * @param createdon the upload Time to set
-	 */
-	public void setUploadTime(Date uploadTime) {
-		this.uploadTime = uploadTime;
+	public void setLength(int length) {
+		this.length = length;
 	}
 
-	/**
-	 * @return the owner userId 
-	 */
-	public long getUserId() {
-		return userId;
+	public String getName() {
+		return this.name;
 	}
 
-	/**
-	 * @param userId the owner userId to set
-	 */
-	public void setUserId(long userId) {
-		this.userId = userId;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	/**
-	 * @return the link
-	 */
-	public String getLink() {
-		return link;
+	public Date getUploadDate() {
+		return this.uploadDate;
 	}
 
-	/**
-	 * @param link the link to set
-	 */
-	public void setLink(String link) {
-		this.link = link;
+	public void setUploadDate(Date uploadDate) {
+		this.uploadDate = uploadDate;
 	}
-	
-	
-	
-	
-	
+
+	public String getUrl() {
+		return this.url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 }
