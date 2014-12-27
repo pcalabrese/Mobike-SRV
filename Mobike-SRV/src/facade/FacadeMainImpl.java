@@ -7,11 +7,12 @@ import persistence.mysql.PathMySQL;
 import model.Path;
 
 	public class FacadeMainImpl implements FacadeMain {
-		
-		private PathRepository pathRep;
-		
+		protected PathRepository pathRep;
+				
 		public FacadeMainImpl(){
+			
 			pathRep = new PathMySQL();
+			
 		}
 		
 		@Override
@@ -24,7 +25,7 @@ import model.Path;
 			 path.setLength(length);
 			 path.setDuration(duration);
 			 path.setUrl(url);
-			 /*settare id? come settare userId?  */
+			 
 			 
 			 pathRep.addPath(path);
 			}
@@ -33,6 +34,7 @@ import model.Path;
 			}
 						
 		}
+
 		@Override
 		public Path searchPath(Long id) {
 			Path path = null;

@@ -2,9 +2,7 @@ package persistence.mysql;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import model.Path;
 import persistence.PathRepository;
 import javax.persistence.*;
@@ -22,12 +20,12 @@ public class PathMySQL implements PathRepository{
 	
 	public Path pathFromId(long id){
 		
-		Path autore = null;
-		Query query = em.createQuery("select a from Autore a where a.cod=:codAutore");
-		query.setParameter("idPath",id);
-		autore =(Path) query.getSingleResult();
+		Path path = null;
+		Query query = em.createQuery("select p from Path p where p.Id=:id");
+		query.setParameter("id",id);
+		path =(Path) query.getSingleResult();
 		
-		return autore;
+		return path;
 		
 	}
 
@@ -83,8 +81,8 @@ public class PathMySQL implements PathRepository{
 		
 		try{
 			em.getTransaction().begin();
-			Path autore = em.find(Path.class,p.getId());
-			if(autore!=null && autore.equals(p))
+			Path path = em.find(Path.class,p.getId());
+			if(path!=null && path.equals(p))
 				em.remove(p);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e){

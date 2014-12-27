@@ -6,7 +6,7 @@ import javax.persistence.Persistence;
 public final class SingletonEMF {
 
 	private static final EntityManagerFactory emfInstance =
-		Persistence.createEntityManagerFactory("mobikeJPA");
+		Persistence.createEntityManagerFactory("Mobike-SRV");
 	
 	private SingletonEMF(){}
 	
