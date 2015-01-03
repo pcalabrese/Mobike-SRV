@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import persistence.exception.FilesystemException;
  
-public class GpxWriter implements PathWriter{
+public class GpxWriter implements RouteWriter{
 	
 	public GpxWriter(){
 		super();
@@ -17,12 +17,12 @@ public class GpxWriter implements PathWriter{
 		String filepath = null;
 		try {
  
-			File file = new File("/paths/"+filename+".gpx");
+			File file = new File("C:/gpxs/"+filename+".gpx");
 			int i=0;
 			
 			/* to prevent file overwriting */
 			while(file.exists()){
-				file = new File ("/paths/"+filename+i+".gpx");
+				file = new File("C:/gpxs/"+filename+i+".gpx");
 				i++;
 			}
  

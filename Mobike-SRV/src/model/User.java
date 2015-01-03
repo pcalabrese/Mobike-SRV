@@ -37,7 +37,7 @@ public class User implements Serializable {
 	private String username;
 	
 	@Transient
-	private List<Path> Paths;
+	private List<Route> Routes;
 
 	public User() {
 	}
@@ -91,17 +91,17 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * @return the paths
+	 * @return the routes
 	 */
-	public List<Path> getPaths() {
-		return Paths;
+	public List<Route> getRoutes() {
+		return Routes;
 	}
 
 	/**
-	 * @param paths the paths to set
+	 * @param routes the routes to set
 	 */
-	public void setPaths(List<Path> paths) {
-		Paths = paths;
+	public void setRoutes(List<Route> routes) {
+		Routes = routes;
 	}
 
 }

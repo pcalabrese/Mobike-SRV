@@ -6,13 +6,13 @@ import java.util.Date;
 
 
 /**
- * The persistent class for the paths database table.
+ * The persistent class for the routes database table.
  * 
  */
 @Entity
-@Table(name="paths")
-@NamedQuery(name="Path.findAll", query="SELECT p FROM Path p")
-public class Path implements Serializable {
+@Table(name="routes")
+@NamedQuery(name="Route.findAll", query="SELECT p FROM Route p")
+public class Route implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -41,7 +41,7 @@ public class Path implements Serializable {
 	@Transient
 	private String gpxString;
 
-	public Path() {
+	public Route() {
 	}
 
 	public long getId() {
@@ -123,7 +123,7 @@ public class Path implements Serializable {
 	}
 
 	public String toString(){
-		return "Path [id=" + id + ", creatorEmail=" + creatorEmail + ", description=" + description +
+		return "Route [id=" + id + ", creatorEmail=" + creatorEmail + ", description=" + description +
 				", duration=" + duration + ", length=" + length +", name=" + name + ", uploadDate=" + uploadDate +
 				", url=" + url + ", gpxString=" + gpxString + "]";
 	}

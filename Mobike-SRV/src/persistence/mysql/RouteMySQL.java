@@ -3,29 +3,29 @@ package persistence.mysql;
 
 import java.util.ArrayList;
 import java.util.List;
-import model.Path;
-import persistence.PathRepository;
+import model.Route;
+import persistence.RouteRepository;
 import javax.persistence.*;
 import persistence.jpa.SingletonEMF;
 
-public class PathMySQL implements PathRepository{
+public class RouteMySQL implements RouteRepository{
 
 	private EntityManagerFactory emf = SingletonEMF.get();
 	private EntityManager em = emf.createEntityManager();
 	
-	public PathMySQL() {}
+	public RouteMySQL() {}
 	
 	
 	
 	
-	public Path pathFromId(long id){
+	public Route routeFromId(long id){
 		
-		Path path = null;
-		Query query = em.createQuery("select p from Path p where p.Id=:id");
+		Route route = null;
+		Query query = em.createQuery("select p from Route p where p.Id=:id");
 		query.setParameter("id",id);
-		path =(Path) query.getSingleResult();
+		route =(Route) query.getSingleResult();
 		
-		return path;
+		return route;
 		
 	}
 
@@ -33,33 +33,33 @@ public class PathMySQL implements PathRepository{
 
 
 	@Override
-	public List<Path> allPath() {
+	public List<Route> allRoute() {
 		
-		List<Path> paths = new ArrayList<Path>();
-		Query query = em.createQuery("select p from Path p");
-		paths =query.getResultList();
-		return paths;
+		List<Route> routes = new ArrayList<Route>();
+		Query query = em.createQuery("select p from Route p");
+		routes =query.getResultList();
+		return routes;
 	}
 
 
 
 
 	@Override
-	public Path pathFromName(String name) {
+	public Route routeFromName(String name) {
 		
-		Path path = null;
-		Query query = em.createQuery("select p from Path p where p.nome=:nome");
+		Route route = null;
+		Query query = em.createQuery("select p from Route p where p.nome=:nome");
 		query.setParameter("name",name);
-		path =(Path) query.getSingleResult();
+		route =(Route) query.getSingleResult();
 		
-		return path;
+		return route;
 	}
 
 
 
 
 	@Override
-	public void addPath(Path p) throws PersistenceException {
+	public void addRoute(Route p) throws PersistenceException {
 		try{
 			em.getTransaction().begin();
 			em.persist(p);
@@ -76,13 +76,13 @@ public class PathMySQL implements PathRepository{
 
 
 	@Override
-	public void removePath(Path p) {
+	public void removeRoute(Route p) {
 		
 		
 		try{
 			em.getTransaction().begin();
-			Path path = em.find(Path.class,p.getId());
-			if(path!=null && path.equals(p))
+			Route route = em.find(Route.class,p.getId());
+			if(route!=null && route.equals(p))
 				em.remove(p);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e){
@@ -101,11 +101,11 @@ public class PathMySQL implements PathRepository{
 
 
 	@Override
-	public void removePathFromId(long id) {
+	public void removeRouteFromId(long id) {
 		
 		try{
 			em.getTransaction().begin();
-			Path p = em.find(Path.class,id);
+			Route p = em.find(Route.class,id);
 			if(p!=null)
 				em.remove(p);
 			em.getTransaction().commit();
