@@ -20,14 +20,14 @@ public class Path implements Serializable {
 	private long id;
 
 	@Column(nullable=false)
-	private long creatorId;
+	private String creatorEmail;
 
 	@Column(nullable=false, length=160)
 	private String description;
 
 	private long duration;
 
-	private int length;
+	private double length;
 
 	@Column(nullable=false, length=50)
 	private String name;
@@ -37,6 +37,9 @@ public class Path implements Serializable {
 
 	@Column(nullable=false, length=160)
 	private String url;
+	
+	@Transient
+	private String gpxString;
 
 	public Path() {
 	}
@@ -49,12 +52,12 @@ public class Path implements Serializable {
 		this.id = id;
 	}
 
-	public long getCreatorId() {
-		return this.creatorId;
+	public String getCreatorEmail() {
+		return this.creatorEmail;
 	}
 
-	public void setCreatorId(long creatorId) {
-		this.creatorId = creatorId;
+	public void setCreatorEmail(String creatorEmail) {
+		this.creatorEmail = creatorEmail;
 	}
 
 	public String getDescription() {
@@ -73,11 +76,11 @@ public class Path implements Serializable {
 		this.duration = duration;
 	}
 
-	public int getLength() {
+	public double getLength() {
 		return this.length;
 	}
 
-	public void setLength(int length) {
+	public void setLength(double length) {
 		this.length = length;
 	}
 
@@ -103,6 +106,26 @@ public class Path implements Serializable {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	
+	/**
+	 * @return the gpxString
+	 */
+	public String getGpxString() {
+		return gpxString;
+	}
+
+	/**
+	 * @param gpxString the gpxString to set
+	 */
+	public void setGpxString(String gpxString) {
+		this.gpxString = gpxString;
+	}
+
+	public String toString(){
+		return "Path [id=" + id + ", creatorEmail=" + creatorEmail + ", description=" + description +
+				", duration=" + duration + ", length=" + length +", name=" + name + ", uploadDate=" + uploadDate +
+				", url=" + url + ", gpxString=" + gpxString + "]";
 	}
 
 }

@@ -1,14 +1,14 @@
 package facade;
 
 import java.util.List;
-
+import java.util.Date;
 import model.Path;
 
 
 public interface FacadeMain{
 
 	
-	public void addPath(String name, String description, String url,int length, long duration, long userId);
+	public void createPath(String name, String description,double length, long duration, Date uploadDate, String creatorEmail, String gpxString);
 	
 	public Path searchPath(Long id);
 	

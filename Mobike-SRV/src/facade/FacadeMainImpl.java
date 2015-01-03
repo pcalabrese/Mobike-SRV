@@ -1,10 +1,14 @@
 package facade;
 
+import java.util.Date;
 import java.util.List;
+
 import persistence.PathRepository;
 import persistence.exception.*;
 import persistence.mysql.PathMySQL;
+import persistence.fs.*;
 import model.Path;
+
 
 	public class FacadeMainImpl implements FacadeMain {
 		protected PathRepository pathRep;
@@ -16,22 +20,39 @@ import model.Path;
 		}
 		
 		@Override
-		public void addPath(String name, String description, String url,int length, long duration, long userId) {
+		public void createPath(String name, String description,double length, long duration, Date uploadDate,String creatorEmail, String gpxString) {
+			 
 			
-			try{
 			 Path path = new Path();
 			 path.setName(name);
 			 path.setDescription(description);
 			 path.setLength(length);
 			 path.setDuration(duration);
-			 path.setUrl(url);
-			 
-			 
-			 pathRep.addPath(path);
+			 path.setGpxString(gpxString);
+			 path.setCreatorEmail(creatorEmail);
+			 path.setUploadDate(uploadDate);
+			 String url = null;
+			
+			
+			try {
+				PathWriter writer = new GpxWriter();
+				url = writer.write(gpxString, path.getName());
 			}
+			
 			catch (Exception e){
-				throw new UncheckedPersistenceException("Error during path creation",e);
+				throw new UncheckedFilesystemException("Error saving file",e);
 			}
+			
+			if(url != null){
+				path.setUrl(url);
+				try {
+					pathRep.addPath(path);
+				}
+				catch (Exception e){
+					throw new UncheckedPersistenceException("Error adding path to database", e);
+				}
+			}
+				
 						
 		}
 
