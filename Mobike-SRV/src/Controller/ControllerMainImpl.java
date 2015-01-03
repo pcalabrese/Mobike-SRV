@@ -1,4 +1,4 @@
-package controller;
+package Controller;
 
 import java.util.Date;
 import java.util.List;
@@ -30,7 +30,35 @@ import javax.ws.rs.core.MediaType;
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
-		@Override
+		@Override //
+		 	public void createRoute(Route route) {
+			 
+			String gpxString = route.getGpxString();
+			String url = null;
+			
+			
+			try {
+				RouteWriter writer = new GpxWriter();
+				url = writer.write(gpxString, route.getName());
+			}
+			
+			catch (Exception e){
+				throw new UncheckedFilesystemException("Error saving file to filesystem",e);
+			}
+			
+			if(url != null){
+				route.setUrl(url);
+				try {
+					routeRep.addRoute(route);
+				}
+				catch (Exception e){
+					throw new UncheckedPersistenceException("Error adding route to database", e);
+				}
+			}
+				
+						
+		}
+		/* OLD METHOD
 		public void createRoute(String name, String description,double length, long duration, Date uploadDate,String creatorEmail, String gpxString) {
 			 
 			 Route route = new Route();
@@ -64,7 +92,7 @@ import javax.ws.rs.core.MediaType;
 			}
 				
 						
-		}
+		}*/
 
 		@Override
 		public Route searchRoute(Long id) {
