@@ -21,10 +21,13 @@ import com.google.gson.*;
 @Path("/routes")
 	public class ControllerMainImpl implements ControllerMain {
 		protected RouteRepository routeRep;
+		
+		/** default Controller Constructor **/
 		public ControllerMainImpl(){
 			routeRep = new RouteMySQL();
 		}
 		
+		/** @  method to add a Route to persistence and filesystem, creation of gpx file **/
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
