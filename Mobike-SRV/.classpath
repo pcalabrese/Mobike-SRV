@@ -25,5 +25,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/persistence-api-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.34-bin.jar"/>
+	<classpathentry kind="var" path="GSON_LIB"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
