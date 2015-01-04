@@ -20,23 +20,19 @@ import javax.ws.rs.core.MediaType;
 @Path("/routes")
 	public class ControllerMainImpl implements ControllerMain {
 		protected RouteRepository routeRep;
-				
 		public ControllerMainImpl(){
-			
 			routeRep = new RouteMySQL();
-			
 		}
 		
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
-		@Override //
-		 	public void createRoute(Route route) {
-			 
-			String gpxString = route.getGpxString();
-			String url = null;
-			
-			
+		@Produces(MediaType.TEXT_PLAIN)
+		public String createRoute(Route route){
+				if(route == null){
+					return "route nulla";}
+				String gpxString = route.getGpxString();
+				String url = null;
 			try {
 				RouteWriter writer = new GpxWriter();
 				url = writer.write(gpxString, route.getName());
@@ -55,10 +51,14 @@ import javax.ws.rs.core.MediaType;
 					throw new UncheckedPersistenceException("Error adding route to database", e);
 				}
 			}
-				
-						
+			return "route valida";
 		}
-		/* OLD METHOD
+		
+		
+		/*
+		@POST
+		@Path("/create")
+		@Consumes(MediaType.APPLICATION_JSON)
 		public void createRoute(String name, String description,double length, long duration, Date uploadDate,String creatorEmail, String gpxString) {
 			 
 			 Route route = new Route();
@@ -92,7 +92,7 @@ import javax.ws.rs.core.MediaType;
 			}
 				
 						
-		}*/
+		} */
 
 		@Override
 		public Route searchRoute(Long id) {

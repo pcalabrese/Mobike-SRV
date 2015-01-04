@@ -1,16 +1,16 @@
 package Controller;
 
 import java.util.List;
-// import java.util.Date;
+import java.util.Date;
 import model.Route;
 
 
 public interface ControllerMain{
 
 	
-	//OLD public void createRoute(String name, String description,double length, long duration, Date uploadDate, String creatorEmail, String gpxString);
+	//public void createRoute(String name, String description,double length, long duration, Date uploadDate, String creatorEmail, String gpxString);
 	
-	public void createRoute(Route route);
+	public String createRoute(Route route);
 	
 	public Route searchRoute(Long id);
 	
