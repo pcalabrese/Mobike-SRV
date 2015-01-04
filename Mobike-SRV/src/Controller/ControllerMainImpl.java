@@ -1,6 +1,5 @@
 package Controller;
 
-import java.util.Date;
 import java.util.List;
 
 import persistence.RouteRepository;
@@ -16,6 +15,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.google.gson.*;
+
 
 @Path("/routes")
 	public class ControllerMainImpl implements ControllerMain {
@@ -27,15 +28,18 @@ import javax.ws.rs.core.MediaType;
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
-		@Produces(MediaType.TEXT_PLAIN)
-		public String createRoute(Route route){
-				if(route == null){
-					return "route nulla";}
-				String gpxString = route.getGpxString();
+		public void createRoute(String json){
+				Gson gson = new GsonBuilder().create();
+				Route r = gson.fromJson(json, Route.class);
+				String gpxString = r.getGpxString();
+				System.out.println(r.getName());
 				String url = null;
+				
+			
+				
 			try {
 				RouteWriter writer = new GpxWriter();
-				url = writer.write(gpxString, route.getName());
+				url = writer.write(gpxString, r.getName());
 			}
 			
 			catch (Exception e){
@@ -43,56 +47,17 @@ import javax.ws.rs.core.MediaType;
 			}
 			
 			if(url != null){
-				route.setUrl(url);
+				r.setUrl(url);
 				try {
-					routeRep.addRoute(route);
+					routeRep.addRoute(r);
 				}
 				catch (Exception e){
 					throw new UncheckedPersistenceException("Error adding route to database", e);
 				}
 			}
-			return "route valida";
+			
 		}
 		
-		
-		/*
-		@POST
-		@Path("/create")
-		@Consumes(MediaType.APPLICATION_JSON)
-		public void createRoute(String name, String description,double length, long duration, Date uploadDate,String creatorEmail, String gpxString) {
-			 
-			 Route route = new Route();
-			 route.setName(name);
-			 route.setDescription(description);
-			 route.setLength(length);
-			 route.setDuration(duration);
-			 route.setGpxString(gpxString);
-			 route.setCreatorEmail(creatorEmail);
-			 route.setUploadDate(uploadDate);
-			 String url = null;
-			
-			
-			try {
-				RouteWriter writer = new GpxWriter();
-				url = writer.write(gpxString, route.getName());
-			}
-			
-			catch (Exception e){
-				throw new UncheckedFilesystemException("Error saving file to filesystem",e);
-			}
-			
-			if(url != null){
-				route.setUrl(url);
-				try {
-					routeRep.addRoute(route);
-				}
-				catch (Exception e){
-					throw new UncheckedPersistenceException("Error adding route to database", e);
-				}
-			}
-				
-						
-		} */
 
 		@Override
 		public Route searchRoute(Long id) {
@@ -110,4 +75,4 @@ import javax.ws.rs.core.MediaType;
 			// TODO Auto-generated method stub
 			return null;
 		}
-	}
+}
