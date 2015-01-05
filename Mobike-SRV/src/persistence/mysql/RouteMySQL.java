@@ -33,7 +33,7 @@ public class RouteMySQL implements RouteRepository{
 	public List<Route> getAllRoutes() {
 		
 		List<Route> routes = new ArrayList<Route>();
-		Query query = em.createQuery("select r from Route r");
+		TypedQuery<Route> query = em.createQuery("select r from Route r",Route.class);
 		routes = query.getResultList();
 		return routes;
 	}
