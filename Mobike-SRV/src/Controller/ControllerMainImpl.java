@@ -12,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -27,7 +28,8 @@ import com.google.gson.*;
 			routeRep = new RouteMySQL();
 		}
 		
-		/** @  method to add a Route to persistence and filesystem, creation of gpx file **/
+		/** @author Paolo
+		 *   method to add a Route to persistence and filesystem, creation of gpx file **/
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -38,44 +40,64 @@ import com.google.gson.*;
 				System.out.println(r.getName());
 				String url = null;
 				
-			
-				
-			try {
-				RouteWriter writer = new GpxWriter();
-				url = writer.write(gpxString, r.getName());
-			}
-			
-			catch (Exception e){
-				throw new UncheckedFilesystemException("Error saving file to filesystem",e);
-			}
-			
-			if(url != null){
-				r.setUrl(url);
 				try {
-					routeRep.addRoute(r);
+					RouteWriter writer = new GpxWriter();
+					url = writer.write(gpxString, r.getName());
 				}
+			
 				catch (Exception e){
-					throw new UncheckedPersistenceException("Error adding route to database", e);
+					throw new UncheckedFilesystemException("Error saving file to filesystem",e);
 				}
-			}
+			
+				if(url != null){
+					r.setUrl(url);
+					try {
+						routeRep.addRoute(r);
+					}
+					catch (Exception e){
+						throw new UncheckedPersistenceException("Error adding route to database", e);
+					}
+				}
+				else {
+					throw new UncheckedFilesystemException("GPX Url not reachable");
+				}
 			
 		}
 		
-
+		@GET
+		@Path("/retrieve/{Id}")
+		@Produces(MediaType.APPLICATION_JSON)
 		@Override
-		public Route searchRoute(Long id) {
+		public String getRoute(@PathParam("Id") Long id) {
+			System.out.println(id);
 			Route route = null;
 			RouteRepository routeREP = new RouteMySQL();
 			try{
 			route = routeREP.routeFromId(id);
 			}
-			catch(PersistenceException pex){}
-			return route;
+			catch(Exception e){
+				throw new UncheckedPersistenceException("Error accessing routes database");
+			}
+			Gson gson = new GsonBuilder().create();
+			
+			return gson.toJson(route, Route.class);
 		}
 
+		@GET
+		@Path("/retrieveall")
+		@Produces(MediaType.APPLICATION_JSON)
 		@Override
-		public List<Route> retriveAllRoutes() {
-			// TODO Auto-generated method stub
-			return null;
+		public String retrieveAllRoutes() {
+			
+			List<Route> allRoutes = null;
+			try {
+				allRoutes = routeRep.getAllRoutes();
+			} catch (Exception e) {
+				throw new UncheckedPersistenceException("Error accessing route database",e);
+			}
+			
+			Gson gson = new GsonBuilder().create();
+			
+			return gson.toJson(allRoutes, List.class);
 		}
 }

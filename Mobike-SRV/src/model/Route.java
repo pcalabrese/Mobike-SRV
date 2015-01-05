@@ -11,7 +11,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name="routes")
-@NamedQuery(name="Route.findAll", query="SELECT p FROM Route p")
+@NamedQuery(name="Route.findAll", query="SELECT r FROM Route r")
 public class Route implements Serializable {
 	private static final long serialVersionUID = 1L;
 

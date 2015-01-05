@@ -7,9 +7,9 @@ public interface ControllerMain{
 	
 	public void createRoute(String json);
 	
-	public Route searchRoute(Long id);
+	public String getRoute(Long id);
 	
-	public List<Route> retriveAllRoutes();
+	public String retrieveAllRoutes();
 	
 	
 }

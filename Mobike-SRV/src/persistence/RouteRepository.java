@@ -10,7 +10,7 @@ public interface RouteRepository {
 	
 	public Route routeFromId(long id) throws PersistenceException;
 	
-	public List<Route> allRoute() throws PersistenceException;
+	public List<Route> getAllRoutes() throws PersistenceException;
 	
 	public Route routeFromName(String name) throws PersistenceException;
 

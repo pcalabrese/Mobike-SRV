@@ -19,25 +19,22 @@ public class RouteMySQL implements RouteRepository{
 	
 	
 	public Route routeFromId(long id){
-		
 		Route route = null;
-		Query query = em.createQuery("select p from Route p where p.Id=:id");
+		TypedQuery<Route> query = em.createQuery("select r from Route r where r.id=:id",Route.class);
 		query.setParameter("id",id);
-		route =(Route) query.getSingleResult();
-		
+		route =query.getSingleResult();
 		return route;
-		
 	}
 
 
 
 
 	@Override
-	public List<Route> allRoute() {
+	public List<Route> getAllRoutes() {
 		
 		List<Route> routes = new ArrayList<Route>();
-		Query query = em.createQuery("select p from Route p");
-		routes =query.getResultList();
+		Query query = em.createQuery("select r from Route r");
+		routes = query.getResultList();
 		return routes;
 	}
 
@@ -48,7 +45,7 @@ public class RouteMySQL implements RouteRepository{
 	public Route routeFromName(String name) {
 		
 		Route route = null;
-		Query query = em.createQuery("select p from Route p where p.nome=:nome");
+		Query query = em.createQuery("select r from Route r where r.nome=:nome");
 		query.setParameter("name",name);
 		route =(Route) query.getSingleResult();
 		
