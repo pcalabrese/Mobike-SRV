@@ -20,23 +20,23 @@ public class Route implements Serializable {
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="routeGen")
 	@Column(unique=true, nullable=false)
 	private long id;
-
+	
+	@Column(nullable=false, length=50)
+	private String name;
+	
 	@Column(nullable=false)
 	private String creatorEmail;
-
-	@Column(nullable=false, length=160)
-	private String description;
-
+	
 	private long duration;
 
 	private double length;
 
-	@Column(nullable=false, length=50)
-	private String name;
-
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date uploadDate;
-
+	
+	@Column(nullable=false, length=160)
+	private String description;
+	
 	@Column(nullable=false, length=160)
 	private String url;
 	
@@ -125,9 +125,8 @@ public class Route implements Serializable {
 	}
 
 	public String toString(){
-		return "Route [id=" + id + ", creatorEmail=" + creatorEmail + ", description=" + description +
-				", duration=" + duration + ", length=" + length +", name=" + name + ", uploadDate=" + uploadDate +
-				", url=" + url + ", gpxString=" + gpxString + "]";
+		return "Route [id=" + id + ", name=" + name + ", creatorEmail=" + creatorEmail + ", duration=" + duration + ", length=" + length +", uploadDate=" + uploadDate +
+				", description=" + description +", url=" + url + ", gpxString=" + gpxString + "]";
 	}
 
 }
