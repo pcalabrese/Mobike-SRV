@@ -1,7 +1,11 @@
 package model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
+import com.google.gson.annotations.Expose;
+
 import java.util.Date;
 
 
@@ -19,28 +23,35 @@ public class Route implements Serializable {
 	@TableGenerator(name="routeGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="ROUTE_ID",allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="routeGen")
 	@Column(unique=true, nullable=false)
+	@Expose
 	private long id;
 	
 	@Column(nullable=false, length=50)
+	@Expose
 	private String name;
 	
 	@Column(nullable=false)
+	@Expose
 	private String creatorEmail;
 	
+	@Expose
 	private long duration;
-
+	@Expose
 	private double length;
 
 	@Temporal(TemporalType.TIMESTAMP)
+	@Expose
 	private Date uploadDate;
 	
 	@Column(nullable=false, length=160)
+	@Expose
 	private String description;
 	
 	@Column(nullable=false, length=160)
 	private String url;
 	
 	@Transient
+	@Expose
 	private String gpxString;
 
 	public Route() {

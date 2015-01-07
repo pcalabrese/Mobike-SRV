@@ -80,7 +80,7 @@ import com.google.gson.*;
 			catch(Exception e){
 				throw new UncheckedPersistenceException("Error accessing routes database");
 			}
-			Gson gson = new GsonBuilder().create();
+			Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 			System.out.println(route.getUrl());
 			return gson.toJson(route, Route.class);
 		}
