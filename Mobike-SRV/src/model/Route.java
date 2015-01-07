@@ -16,6 +16,8 @@ public class Route implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@TableGenerator(name="routeGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="ROUTE_ID",allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="routeGen")
 	@Column(unique=true, nullable=false)
 	private long id;
 

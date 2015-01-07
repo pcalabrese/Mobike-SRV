@@ -33,12 +33,13 @@ import com.google.gson.*;
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
-		public void createRoute(String json){
+		@Produces(MediaType.TEXT_PLAIN)
+		public String createRoute(String json){
 				Gson gson = new GsonBuilder().create();
 				Route r = gson.fromJson(json, Route.class);
 				String gpxString = r.getGpxString();
-				System.out.println(r.getName());
 				String url = null;
+				long insertedId = -1;
 				
 				try {
 					RouteWriter writer = new GpxWriter();
@@ -52,7 +53,7 @@ import com.google.gson.*;
 				if(url != null){
 					r.setUrl(url);
 					try {
-						routeRep.addRoute(r);
+						insertedId = routeRep.addRoute(r);
 					}
 					catch (Exception e){
 						throw new UncheckedPersistenceException("Error adding route to database", e);
@@ -61,6 +62,7 @@ import com.google.gson.*;
 				else {
 					throw new UncheckedFilesystemException("GPX Url not reachable");
 				}
+				return "" +insertedId +"";
 			
 		}
 		

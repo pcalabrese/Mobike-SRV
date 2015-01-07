@@ -14,7 +14,7 @@ public interface RouteRepository {
 	
 	public Route routeFromName(String name) throws PersistenceException;
 
-	public void addRoute(Route p) throws PersistenceException;
+	public long addRoute(Route p) throws PersistenceException;
 	
 	public void removeRoute(Route p) throws PersistenceException;
 	

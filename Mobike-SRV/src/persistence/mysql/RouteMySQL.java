@@ -56,17 +56,23 @@ public class RouteMySQL implements RouteRepository{
 
 
 	@Override
-	public void addRoute(Route p) throws PersistenceException {
+	public long addRoute(Route p) throws PersistenceException {
+		long insertedId = -1;
 		try{
 			em.getTransaction().begin();
 			em.persist(p);
 			em.getTransaction().commit();
-		}catch(IllegalArgumentException e){
+			insertedId = p.getId();
+			
+			}
+		catch(IllegalArgumentException e){
 			e.getStackTrace();
-		}
+			}
 		finally{
+			
 			em.close();
-		}
+			}
+		return insertedId;	
 	}
 
 

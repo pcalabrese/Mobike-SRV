@@ -2,7 +2,7 @@ package Controller;
 
 public interface ControllerMain{
 	
-	public void createRoute(String json);
+	public String createRoute(String json);
 	
 	public String getRoute(Long id);
 	
