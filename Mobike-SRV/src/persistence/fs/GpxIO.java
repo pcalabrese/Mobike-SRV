@@ -49,7 +49,7 @@ public class GpxIO implements RouteIO{
 	}
 
 	@Override
-	public String read(String filename) throws FilesystemException {
+	public String read(String filepath) throws FilesystemException {
 		BufferedReader br = null;
 		String result = "";
 		 
@@ -57,7 +57,7 @@ public class GpxIO implements RouteIO{
  
 			String sCurrentLine;
  
-			br = new BufferedReader(new FileReader("C:\\gpxs\\"+filename));
+			br = new BufferedReader(new FileReader(filepath));
 			
 			while ((sCurrentLine = br.readLine()) != null) {
 				result.concat(sCurrentLine);

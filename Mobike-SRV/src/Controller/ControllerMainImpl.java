@@ -104,8 +104,27 @@ import com.google.gson.*;
 		}
 
 		@Override
-		public String getRoutegpx(Long id) {
-			// TODO Auto-generated method stub
-			return null;
+		@GET
+		@Path("/routes/{Id}/gpx")
+		@Produces(MediaType.APPLICATION_JSON)
+		public String getRoutegpx(@PathParam("Id") Long id) {
+			String gpxString;
+			RouteIO fsrepo = new GpxIO();
+			Route r = null;
+			try {
+				r = routeRep.routeFromId(id);
+			}
+			catch (Exception e) {
+				throw new UncheckedPersistenceException("Error accessing route database",e);
+			}
+			try{
+				gpxString = fsrepo.read(r.getUrl());
+			}
+			catch (Exception e){
+				throw new UncheckedFilesystemException("Error reading gpx file",e);
+			}
+			r.setGpxString(gpxString);
+			Gson gson = new GsonBuilder().create();
+			return gson.toJson(r,Route.class);
 		}
 }
