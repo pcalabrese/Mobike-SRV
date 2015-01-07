@@ -7,6 +7,8 @@ public interface ControllerMain{
 	public String getRoute(Long id);
 	
 	public String retrieveAllRoutes();
+
+	public String getRoutegpx(Long id);
 	
 	
 }

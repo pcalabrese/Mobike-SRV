@@ -42,7 +42,7 @@ import com.google.gson.*;
 				long insertedId = -1;
 				
 				try {
-					RouteWriter writer = new GpxWriter();
+					RouteIO writer = new GpxIO();
 					url = writer.write(gpxString, r.getName());
 				}
 			
@@ -101,5 +101,11 @@ import com.google.gson.*;
 			Gson gson = new GsonBuilder().create();
 			
 			return gson.toJson(allRoutes, List.class);
+		}
+
+		@Override
+		public String getRoutegpx(Long id) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 }

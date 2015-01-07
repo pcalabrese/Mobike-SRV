@@ -4,12 +4,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import persistence.exception.FilesystemException;
  
-public class GpxWriter implements RouteWriter{
+public class GpxIO implements RouteIO{
 	
-	public GpxWriter(){
+	public GpxIO(){
 		super();
 	}
 	
@@ -45,4 +47,35 @@ public class GpxWriter implements RouteWriter{
 		
 
 	}
+
+	@Override
+	public String read(String filename) throws FilesystemException {
+		BufferedReader br = null;
+		String result = "";
+		 
+		try {
+ 
+			String sCurrentLine;
+ 
+			br = new BufferedReader(new FileReader("C:\\gpxs\\"+filename));
+			
+			while ((sCurrentLine = br.readLine()) != null) {
+				result.concat(sCurrentLine);
+			}
+ 
+		} catch (IOException e) {
+			throw new FilesystemException(e.getMessage());
+		} finally {
+			try {
+				if (br != null)br.close();
+			} catch (IOException e) {
+				throw new FilesystemException(e.getMessage());
+			}
+		}
+		
+		return result;
+	}
+
+	
+
 }
