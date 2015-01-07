@@ -2,6 +2,7 @@ package persistence.fs;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -49,19 +50,50 @@ public class GpxIO implements RouteIO{
 	}
 
 	@Override
-	public String read(String filepath) throws FilesystemException {
-		BufferedReader br = null;
-		String result = "";
-		 
+	public String read(String filename) throws FilesystemException {
+		BufferedReader br;
 		try {
+			br = new BufferedReader(new FileReader("C:/gpxs/"+filename));
+		} 
+		catch (FileNotFoundException e) {
+			throw new FilesystemException(e.getMessage());
+		}
+		    try {
+		        StringBuilder sb = new StringBuilder();
+		        String line = br.readLine();
+
+		        while (line != null) {
+		            sb.append(line);
+//		            sb.append("\n");
+		            line = br.readLine();
+		        }
+		        return sb.toString();
+		    } 
+		    catch (Exception e) {
+		    	throw new FilesystemException(e.getMessage());
+		    }
+		    finally {
+		        try {
+					br.close();
+				} catch (IOException e) {
+					throw new FilesystemException(e.getMessage());
+				}
+		    }
+		   
+		 
+		/*try {
  
 			String sCurrentLine;
  
-			br = new BufferedReader(new FileReader(filepath));
+			br = new BufferedReader(new FileReader("C:/gpxs/"+filename));
 			
+			System.out.println("C:/gpxs/"+filename);
 			while ((sCurrentLine = br.readLine()) != null) {
+				
+				System.out.println(sCurrentLine);
 				result.concat(sCurrentLine);
 			}
+			System.out.println(result);
  
 		} catch (IOException e) {
 			throw new FilesystemException(e.getMessage());
@@ -73,7 +105,7 @@ public class GpxIO implements RouteIO{
 			}
 		}
 		
-		return result;
+		return result; */
 	}
 
 	

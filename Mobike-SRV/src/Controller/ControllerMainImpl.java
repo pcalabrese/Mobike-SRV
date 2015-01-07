@@ -81,7 +81,7 @@ import com.google.gson.*;
 				throw new UncheckedPersistenceException("Error accessing routes database");
 			}
 			Gson gson = new GsonBuilder().create();
-			
+			System.out.println(route.getUrl());
 			return gson.toJson(route, Route.class);
 		}
 
@@ -105,8 +105,8 @@ import com.google.gson.*;
 
 		@Override
 		@GET
-		@Path("/routes/{Id}/gpx")
-		@Produces(MediaType.APPLICATION_JSON)
+		@Path("/retrieve/{Id}/gpx")
+		@Produces(MediaType.APPLICATION_XML)
 		public String getRoutegpx(@PathParam("Id") Long id) {
 			String gpxString;
 			RouteIO fsrepo = new GpxIO();
@@ -118,13 +118,13 @@ import com.google.gson.*;
 				throw new UncheckedPersistenceException("Error accessing route database",e);
 			}
 			try{
-				gpxString = fsrepo.read(r.getUrl());
+				gpxString = fsrepo.read(r.getUrl().substring(8));
+				
 			}
 			catch (Exception e){
 				throw new UncheckedFilesystemException("Error reading gpx file",e);
 			}
-			r.setGpxString(gpxString);
-			Gson gson = new GsonBuilder().create();
-			return gson.toJson(r,Route.class);
+			return gpxString;
+			
 		}
 }
