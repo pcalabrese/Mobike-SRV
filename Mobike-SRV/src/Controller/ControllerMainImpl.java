@@ -17,19 +17,32 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.google.gson.*;
-
-
+/** 
+ * Main RESTful Controller for HTTP POST and GET requests
+ * @author Paolo, Bruno, Marco, Andrea
+ * @version 2.0
+ * @see ControllerMain ControllerMain: Interface implemented by this class
+ * @see RouteMySQL RouteMySQL: SQL DAO Class
+ * 
+ */
 @Path("/routes")
 	public class ControllerMainImpl implements ControllerMain {
 		protected RouteRepository routeRep;
 		
-		/** default Controller Constructor **/
+		/** default ControllerMainImpl Constructor **/
 		public ControllerMainImpl(){
 			routeRep = new RouteMySQL();
 		}
 		
-		/** @author Paolo
-		 *   method to add a Route to persistence and filesystem, creation of gpx file **/
+		/**
+		 * Method to add a Route to persistence and create gpx file in the server filesystem
+		 * @param json JSON file containing the Route Details formatted in this way: Route [id=" + id + ", name=" + name + ", creatorEmail=" + creatorEmail + ", duration=" + duration + ", length=" + length +", uploadDate=" + uploadDate +", description=" + description +", url=" + url + ", gpxString=" + gpxString + "]";
+		 * @return String containing the ID of the created route
+		 * @see Route Route: Model Class
+		 * @see Gson
+		 * @version 2.1
+		 * 
+		 */
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
@@ -66,6 +79,16 @@ import com.google.gson.*;
 			
 		}
 		
+		/**
+		 * Method to retrieve a Route by the id
+		 * @param id Long ID of the requested Route
+		 * @return JSON formatted Route
+		 * @see Route Route: Model Class
+		 * @see RouteMySql RouteMySql: SQL DAO Class
+		 * @see Gson
+		 * @version 2.1
+		 * 
+		 */
 		@GET
 		@Path("/retrieve/{Id}")
 		@Produces(MediaType.APPLICATION_JSON)
@@ -85,6 +108,13 @@ import com.google.gson.*;
 			return gson.toJson(route, Route.class);
 		}
 
+		/**
+		 * Method to retrieve a Route by the id
+		 * @param id Long ID
+		 * @return JSON formatted Route
+		 * @version 2.1
+		 * 
+		 */
 		@GET
 		@Path("/retrieveall")
 		@Produces(MediaType.APPLICATION_JSON)
@@ -103,6 +133,14 @@ import com.google.gson.*;
 			return gson.toJson(allRoutes, List.class);
 		}
 
+		/**
+		 * Method to retrieve the .gpx file by the Route id
+		 * @param id Long ID
+		 * @return gpxString String containing gpx-formatted infos
+		 * @see GpxIO GpxIO: class to read and write from and to file in the server filesystem
+		 * @version 2.1
+		 * 
+		 */
 		@Override
 		@GET
 		@Path("/retrieve/{Id}/gpx")
