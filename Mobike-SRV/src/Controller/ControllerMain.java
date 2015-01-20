@@ -3,9 +3,8 @@ package Controller;
 /** 
  * Main Controller interface
  * @author Paolo, Bruno, Marco, Andrea
- * @version 2.0
  * @see ControllerMainImpl Controller.ControllerMainImpl: implemented class
- * 
+ * @version 2.0
  */
 public interface ControllerMain{
 	

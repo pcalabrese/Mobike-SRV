@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 
 /**
- * The persistent class for the users database table.
+ * The model class with JPA annotation for Users database table.
  * 
  */
 @Entity
@@ -40,53 +40,92 @@ public class User implements Serializable {
 	@Transient
 	private List<Route> Routes;
 
+	/**
+	 * default empty User Constructor
+	 */
 	public User() {
 	}
 
+	/**
+	 * @return id
+	 */
 	public long getId() {
 		return this.id;
 	}
 
+	/**
+	 * @param id
+	 */
 	public void setId(long id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return email
+	 */
 	public String getEmail() {
 		return this.email;
 	}
 
+	/**
+	 * @param email
+	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
+	/**
+	 * @return name
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * @param name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return password
+	 */
 	public String getPassword() {
 		return this.password;
 	}
 
+	/**
+	 * @param password
+	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
+	/**
+	 * @return surname
+	 */
 	public String getSurname() {
 		return this.surname;
 	}
 
+	/**
+	 * @param surname
+	 */
 	public void setSurname(String surname) {
 		this.surname = surname;
 	}
 
+	/**
+	 * @return username
+	 */
 	public String getUsername() {
 		return this.username;
 	}
 
+	/**
+	 * @param username
+	 */
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -99,7 +138,7 @@ public class User implements Serializable {
 	}
 
 	/**
-	 * @param routes the routes to set
+	 * @param List<Route> the routes to set
 	 */
 	public void setRoutes(List<Route> routes) {
 		Routes = routes;

@@ -10,7 +10,7 @@ import java.util.Date;
 
 
 /**
- * The persistent class for the routes database table.
+ * The model class with JPA annotation for Routes database table.
  * 
  */
 @Entity
@@ -54,69 +54,120 @@ public class Route implements Serializable {
 	@Expose
 	private String gpxString;
 
+	/**
+	 * default empty Route Constructor
+	 */
 	public Route() {
 	}
 
+	/**
+	 * @return id
+	 */
 	public long getId() {
 		return this.id;
 	}
 
+	/**
+	 * @param id
+	 */
 	public void setId(long id) {
 		this.id = id;
 	}
 
+	/**
+	 * @return creatorEmail
+	 */
 	public String getCreatorEmail() {
 		return this.creatorEmail;
 	}
 
+	/**
+	 * @param creatorEmail
+	 */
 	public void setCreatorEmail(String creatorEmail) {
 		this.creatorEmail = creatorEmail;
 	}
 
+	/**
+	 * @return description
+	 */
 	public String getDescription() {
 		return this.description;
 	}
 
+	/**
+	 * @param description
+	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
+	/**
+	 * @return Duration
+	 */
 	public long getDuration() {
 		return this.duration;
 	}
 
+	/**
+	 * @param duration
+	 */
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 
+	/**
+	 * @return Length
+	 */
 	public double getLength() {
 		return this.length;
 	}
 
+	/**
+	 * @param length
+	 */
 	public void setLength(double length) {
 		this.length = length;
 	}
 
+	/**
+	 * @return Name
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * @param name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * @return Date
+	 */
 	public Date getUploadDate() {
 		return this.uploadDate;
 	}
 
+	/**
+	 * @param uploadDate
+	 */
 	public void setUploadDate(Date uploadDate) {
 		this.uploadDate = uploadDate;
 	}
 
+	/**
+	 * @return url the Url String
+	 */
 	public String getUrl() {
 		return this.url;
 	}
 
+	/**
+	 * @param url
+	 */
 	public void setUrl(String url) {
 		this.url = url;
 	}
