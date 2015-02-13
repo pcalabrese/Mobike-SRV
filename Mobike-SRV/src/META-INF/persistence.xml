@@ -4,6 +4,7 @@
 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>model.Route</class>
 		<class>model.User</class>
+		<class>model.Event</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mobike"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>
