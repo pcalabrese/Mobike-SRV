@@ -1,12 +1,12 @@
 package persistence.mysql;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import model.Route;
 import persistence.RouteRepository;
 import javax.persistence.*;
 import persistence.jpa.SingletonEMF;
+
 
 public class RouteMySQL implements RouteRepository{
 
@@ -16,8 +16,7 @@ public class RouteMySQL implements RouteRepository{
 	public RouteMySQL() {}
 	
 	
-	
-	
+	@Override
 	public Route routeFromId(long id){
 		Route route = null;
 		TypedQuery<Route> query = em.createQuery("select r from Route r where r.id=:id",Route.class);
@@ -45,7 +44,7 @@ public class RouteMySQL implements RouteRepository{
 	public Route routeFromName(String name) {
 		
 		Route route = null;
-		Query query = em.createQuery("select r from Route r where r.nome=:nome");
+		Query query = em.createQuery("select r from Route r where r.name=:name");
 		query.setParameter("name",name);
 		route =(Route) query.getSingleResult();
 		
