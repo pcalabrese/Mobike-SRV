@@ -34,6 +34,10 @@ public class Route implements Serializable {
 	@Expose
 	private String creatorEmail;
 	
+	/*@ManyToOne(fetch=FetchType.LAZY)
+	@JoinColumn(name="USERID")
+	private User creatorUser; */
+
 	@Expose
 	private long duration;
 	@Expose
@@ -80,6 +84,17 @@ public class Route implements Serializable {
 	public String getCreatorEmail() {
 		return this.creatorEmail;
 	}
+
+	/*
+	public User getCreatorUser() {
+		return creatorUser;
+	}
+
+	 
+	public void setCreatorUser(User creatorUser) {
+		this.creatorUser = creatorUser;
+	}
+	*/
 
 	/**
 	 * @param creatorEmail
