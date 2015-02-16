@@ -45,4 +45,6 @@ public interface UserRepository {
 	 * @throws PersistenceException
 	 */
 	public void removeUserFromId(long id) throws PersistenceException;
+	
+	public boolean userExists(String email) throws PersistenceException;
 }

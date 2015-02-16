@@ -91,4 +91,23 @@ public class UserServicesImpl implements UserServices {
 		return null;
 	}
 
+	@Override
+	@GET
+	@Path("/check")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String userExists(@QueryParam("userjson") String json) {
+		Gson gson = new GsonBuilder().create();
+		User u = gson.fromJson(json, User.class);
+		String result = null;
+		try {
+			result = String.valueOf(userRep.userExists(u.getEmail()));
+		}
+		catch (Exception e){
+			throw new UncheckedPersistenceException("Error checking user account");
+		}
+		
+		return result;
+		
+	}
+
 }

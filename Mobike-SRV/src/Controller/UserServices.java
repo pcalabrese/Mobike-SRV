@@ -38,6 +38,13 @@ public interface UserServices{
 	 */
 	public String getUserEvents(long id);
 	
+	/**
+	 * @param id
+	 * @return String
+	 */
+	public String userExists(String json);
+	
+	
 	
 	
 }
