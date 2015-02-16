@@ -6,10 +6,11 @@
 		<class>model.User</class>
 		<class>model.Event</class>
 		<properties>
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/mobike"/>
-			<property name="javax.persistence.jdbc.user" value="root"/>
-			<property name="javax.persistence.jdbc.password" value="msql2014_pbma"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.10.100:3306/mobike"/>
+			<property name="javax.persistence.jdbc.user" value="paolo"/>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+			<property name="javax.persistence.jdbc.password" value="psql2015_pbma"/>
+			<property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
 		</properties>
 	</persistence-unit>
 </persistence>

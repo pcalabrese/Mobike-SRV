@@ -5,10 +5,10 @@ package Controller;
 /** 
  * Main Controller interface
  * @author Paolo, Bruno, Marco, Andrea
- * @see ControllerMainImpl Controller.ControllerMainImpl: implemented class
+ * @see RouteServicesImpl Controller.RouteServicesImpl: implemented class
  * @version 2.0
  */
-public interface ControllerMain{
+public interface RouteServices{
 	
 	/**
 	 * @param json

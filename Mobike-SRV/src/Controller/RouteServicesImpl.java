@@ -21,16 +21,16 @@ import com.google.gson.*;
  * Main RESTful Controller for HTTP POST and GET requests
  * @author Paolo, Bruno, Marco, Andrea
  * @version 2.0
- * @see ControllerMain ControllerMain: Interface implemented by this class
+ * @see RouteServices RouteServices: Interface implemented by this class
  * @see RouteMySQL RouteMySQL: SQL DAO Class
  * 
  */
 @Path("/routes")
-	public class ControllerMainImpl implements ControllerMain {
+	public class RouteServicesImpl implements RouteServices {
 		protected RouteRepository routeRep;
 		
-		/** default ControllerMainImpl Constructor **/
-		public ControllerMainImpl(){
+		/** default RouteServicesImpl Constructor **/
+		public RouteServicesImpl(){
 			routeRep = new RouteMySQL();
 		}
 		
