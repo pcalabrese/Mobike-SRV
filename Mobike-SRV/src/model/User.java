@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.google.gson.annotations.Expose;
+
 
 /**
  * The model class with JPA annotation for Users database table.
@@ -20,27 +22,34 @@ public class User implements Serializable {
 	@TableGenerator(name="userGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="USER_ID",allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
 	@Column(unique=true, nullable=false)
+	@Expose
 	private long id;
-
+	
+	@Expose
 	@Column(nullable=false, length=50)
 	private String email;
 
+	@Expose
 	@Column(nullable=false, length=50)
 	private String name;
 
-	@Column(nullable=false, length=50)
+	//@Column(nullable=false, length=50)
+	@Transient
 	private String password;
 
-	@Column(length=50)
+	@Expose
+	@Column(nullable=false, length=50)
 	private String surname;
 
-	@Column(nullable=false, length=50)
+	//@Column(nullable=false, length=50)
+	@Transient
 	private String username;
 	
 	/**@Transient
 	 * 
 	 */
 	//@OneToMany(mappedBy="creatorUser")
+	@Transient
 	private List<Route> Routes;
 
 	/**

@@ -36,7 +36,7 @@ public class UserServicesImpl implements UserServices {
 	@Path("/getUser")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUser(@NotNull @QueryParam("id") long id, @NotNull @QueryParam("token") String token) {
-		if(token.equals("AB591CA5CDC77D6E787E596F5E")){
+		if(token.equals("MW21B4YS4VEEZ5M1CDTBRYBC2FESXWKOXQBV92EAB591CA5CDC77D6E787E596F5E")){
 			User u = null;
 			try {
 				u = userRep.userFromId(id);

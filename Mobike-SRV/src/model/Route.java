@@ -57,6 +57,31 @@ public class Route implements Serializable {
 	@Transient
 	@Expose
 	private String gpxString;
+	
+	@Column(length=50)
+	@Expose
+	private String type;
+	
+	@Column
+	@Expose
+	private int difficulty;
+	
+	@Column
+	@Expose
+	private int rating;
+	
+	@Column
+	@Expose
+	private int bends;
+	
+	@Column
+	@Expose
+	private int ratingnumber;
+	
+	
+	
+	
+	
 
 	/**
 	 * default empty Route Constructor
@@ -201,9 +226,79 @@ public class Route implements Serializable {
 		this.gpxString = gpxString;
 	}
 
+	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the difficulty
+	 */
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+	/**
+	 * @param difficulty the difficulty to set
+	 */
+	public void setDifficulty(int difficulty) {
+		this.difficulty = difficulty;
+	}
+
+	/**
+	 * @return the rating
+	 */
+	public int getRating() {
+		return rating;
+	}
+
+	/**
+	 * @param rating the rating to set
+	 */
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
+
+	/**
+	 * @return the bends
+	 */
+	public int getBends() {
+		return bends;
+	}
+
+	/**
+	 * @param bends the bends to set
+	 */
+	public void setBends(int bends) {
+		this.bends = bends;
+	}
+
+	/**
+	 * @return the ratingnumber
+	 */
+	public int getRatingnumber() {
+		return ratingnumber;
+	}
+
+	/**
+	 * @param ratingnumber the ratingnumber to set
+	 */
+	public void setRatingnumber(int ratingnumber) {
+		this.ratingnumber = ratingnumber;
+	}
+
 	public String toString(){
 		return "Route [id=" + id + ", name=" + name + ", creatorEmail=" + creatorEmail + ", duration=" + duration + ", length=" + length +", uploadDate=" + uploadDate +
-				", description=" + description +", url=" + url + ", gpxString=" + gpxString + "]";
+				", description=" + description +", url=" + url + ", gpxString=" + gpxString + ", type=" + type + ", difficulty=" + difficulty + ", rating=" + rating + ", bends=" + bends + ", ratingnumber=" + ratingnumber + "]";
 	}
 
 }
