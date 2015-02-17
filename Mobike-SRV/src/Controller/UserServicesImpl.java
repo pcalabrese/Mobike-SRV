@@ -1,12 +1,8 @@
 package Controller;
 
-import java.util.List;
-
 import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.UserMySQL;
-import persistence.fs.*;
-import model.Route;
 import model.User;
 
 import javax.validation.constraints.NotNull;
@@ -14,7 +10,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
