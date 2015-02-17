@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 import com.google.gson.annotations.Expose;
 
-import java.util.Date;
+
 import java.util.List;
 import java.sql.Timestamp;
 
@@ -25,7 +25,7 @@ public class Event implements Serializable {
 	@TableGenerator(name="eventGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="EVENT_ID",allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.TABLE, generator="eventGen")
 	@Expose
-	private long eventID;
+	private long id;
 
 	@Expose
 	private long creatorId;
@@ -39,28 +39,28 @@ public class Event implements Serializable {
 	@Expose
 	private long routeId;
 
-	@Temporal(TemporalType.DATE)
+
 	@Expose
-	private Date startDate;
+	private Timestamp startDate;
 
 	@Expose
 	private String startLocation;
 
 	@Expose
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date creationDate;
+	private Timestamp creationDate;
 	
+	@Transient
 	private List<User> participantsId;
 
 	public Event() {
 	}
 
-	public long getEventID() {
-		return this.eventID;
+	public long getid() {
+		return this.id;
 	}
 
-	public void setEventID(long eventID) {
-		this.eventID = eventID;
+	public void setid(long id) {
+		this.id = id;
 	}
 
 	public long getCreatorId() {
@@ -95,11 +95,11 @@ public class Event implements Serializable {
 		this.routeId = routeId;
 	}
 
-	public Date getStartDate() {
+	public Timestamp getStartDate() {
 		return this.startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(Timestamp startDate) {
 		this.startDate = startDate;
 	}
 
@@ -111,12 +111,17 @@ public class Event implements Serializable {
 		this.startLocation = startLocation;
 	}
 
-	public Date getCreationDate() {
+	public Timestamp getCreationDate() {
 		return this.creationDate;
 	}
 
-	public void setCreationDate(Date creationDate) {
+	public void setCreationDate(Timestamp creationDate) {
 		this.creationDate = creationDate;
+	}
+	
+	public String toString(){
+		return "Event [id=" + id + ", name=" + name + ", creatorId=" + creatorId + ", description=" + description + ", routeId=" + routeId +", startDate=" + startDate +
+				", startLocation=" + startLocation +", creationDate=" + creationDate + "]";
 	}
 
 }

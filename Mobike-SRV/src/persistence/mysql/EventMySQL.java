@@ -20,9 +20,11 @@ public class EventMySQL implements EventRepository{
 	@Override
 	public Event eventFromId(long id){
 		Event event = null;
+		System.out.println(id);
 		TypedQuery<Event> query = em.createQuery("select e from Event e where e.id=:id",Event.class);
 		query.setParameter("id",id);
 		event =query.getSingleResult();
+		System.out.println(event.getName());
 		return event;
 	}
 
@@ -45,7 +47,7 @@ public class EventMySQL implements EventRepository{
 			em.getTransaction().begin();
 			em.persist(e);
 			em.getTransaction().commit();
-			insertedId = e.getEventID();
+			insertedId = e.getid();
 			
 			}
 		catch(IllegalArgumentException e1){
@@ -67,7 +69,7 @@ public class EventMySQL implements EventRepository{
 		
 		try{
 			em.getTransaction().begin();
-			Event event = em.find(Event.class,e.getEventID());
+			Event event = em.find(Event.class,e.getid());
 			if(event!=null && event.equals(e))
 				em.remove(e);
 			em.getTransaction().commit();
