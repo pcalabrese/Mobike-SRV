@@ -37,12 +37,8 @@ public interface UserServices{
 	 * @return String
 	 */
 	public String getUserEvents(long id);
+
 	
-	/**
-	 * @param id
-	 * @return String
-	 */
-	public String userExists(String json);
 	
 	
 	

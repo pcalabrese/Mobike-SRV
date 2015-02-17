@@ -4,10 +4,11 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Date;
 import java.util.List;
 import java.sql.Timestamp;
-import java.math.BigInteger;
 
 
 /**
@@ -21,25 +22,33 @@ public class Event implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@TableGenerator(name="eventGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="EVENT_ID",allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="eventGen")
+	@Expose
 	private long eventID;
 
-	private BigInteger creatorId;
-
+	@Expose
+	private long creatorId;
+	
+	@Expose
 	private String description;
 
+	@Expose
 	private String name;
 
-	private BigInteger routeId;
+	@Expose
+	private long routeId;
 
 	@Temporal(TemporalType.DATE)
+	@Expose
 	private Date startDate;
 
+	@Expose
 	private String startLocation;
 
-	private Timestamp startTime;
-
+	@Expose
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date uploadDate;
+	private Date creationDate;
 	
 	private List<User> participantsId;
 
@@ -54,11 +63,11 @@ public class Event implements Serializable {
 		this.eventID = eventID;
 	}
 
-	public BigInteger getCreatorId() {
+	public long getCreatorId() {
 		return this.creatorId;
 	}
 
-	public void setCreatorId(BigInteger creatorId) {
+	public void setCreatorId(long creatorId) {
 		this.creatorId = creatorId;
 	}
 
@@ -78,11 +87,11 @@ public class Event implements Serializable {
 		this.name = name;
 	}
 
-	public BigInteger getRouteId() {
+	public long getRouteId() {
 		return this.routeId;
 	}
 
-	public void setRouteId(BigInteger routeId) {
+	public void setRouteId(long routeId) {
 		this.routeId = routeId;
 	}
 
@@ -102,20 +111,12 @@ public class Event implements Serializable {
 		this.startLocation = startLocation;
 	}
 
-	public Timestamp getStartTime() {
-		return this.startTime;
+	public Date getCreationDate() {
+		return this.creationDate;
 	}
 
-	public void setStartTime(Timestamp startTime) {
-		this.startTime = startTime;
-	}
-
-	public Date getUploadDate() {
-		return this.uploadDate;
-	}
-
-	public void setUploadDate(Date uploadDate) {
-		this.uploadDate = uploadDate;
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
 	}
 
 }

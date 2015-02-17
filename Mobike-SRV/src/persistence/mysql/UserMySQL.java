@@ -42,11 +42,14 @@ public class UserMySQL implements UserRepository {
 
 	
 	@Override
-	public User userFromName(String name) throws PersistenceException {
+	public User userFromEmail(String email) throws PersistenceException {
+		List<User> users = new ArrayList<User>();
 		User user = null;
-		Query query = em.createQuery("select u from User u where u.name=:name");
-		query.setParameter("name",name);
-		user =(User) query.getSingleResult();
+		TypedQuery<User> query = em.createQuery("select u from User u where u.email=:email",User.class);
+		query.setParameter("email",email);
+		users = query.getResultList();
+		if(!users.isEmpty())
+			user = users.get(0);
 		return user;
 	}
 

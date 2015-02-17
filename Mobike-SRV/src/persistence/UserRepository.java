@@ -25,7 +25,7 @@ public interface UserRepository {
 	 * @return User
 	 * @throws PersistenceException
 	 */
-	public User userFromName(String name) throws PersistenceException;
+	public User userFromEmail(String email) throws PersistenceException;
 
 	/**
 	 * @param u User
