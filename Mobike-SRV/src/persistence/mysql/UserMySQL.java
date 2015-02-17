@@ -112,11 +112,16 @@ public class UserMySQL implements UserRepository {
 
 	@Override
 	public boolean userExists(String email) throws PersistenceException {
-		User user = null;
+		boolean output = false;
 		TypedQuery<User> query = em.createQuery("select u from User u where u.email=:email",User.class);
 		query.setParameter("email",email);
-		user =query.getSingleResult();
-		return user==null;
+		
+		if(!(query.getResultList().isEmpty()))
+			output = true;
+		
+		return output;
+			
+	
 		
 	}
 

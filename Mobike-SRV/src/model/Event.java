@@ -21,7 +21,7 @@ public class Event implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private String eventID;
+	private long eventID;
 
 	private BigInteger creatorId;
 
@@ -46,11 +46,11 @@ public class Event implements Serializable {
 	public Event() {
 	}
 
-	public String getEventID() {
+	public long getEventID() {
 		return this.eventID;
 	}
 
-	public void setEventID(String eventID) {
+	public void setEventID(long eventID) {
 		this.eventID = eventID;
 	}
 

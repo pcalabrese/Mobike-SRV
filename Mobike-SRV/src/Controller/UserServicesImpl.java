@@ -99,6 +99,7 @@ public class UserServicesImpl implements UserServices {
 		Gson gson = new GsonBuilder().create();
 		User u = gson.fromJson(json, User.class);
 		String result = null;
+		
 		try {
 			result = String.valueOf(userRep.userExists(u.getEmail()));
 		}
