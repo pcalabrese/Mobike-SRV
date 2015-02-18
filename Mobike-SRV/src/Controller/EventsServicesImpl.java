@@ -43,7 +43,7 @@ public class EventsServicesImpl implements EventsServices {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public String createEvent(String json) {
-		Gson gson = new GsonBuilder().create();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		Event e = gson.fromJson(json, Event.class);
 		long insertedId = -1;
 		
@@ -75,7 +75,7 @@ public class EventsServicesImpl implements EventsServices {
 			throw new UncheckedPersistenceException("Error retrieving allEvents from the DataBase");
 		}
 		
-		Gson gson = new GsonBuilder().create();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		
 		
 		return gson.toJson(allEvents,List.class);
@@ -96,7 +96,7 @@ public class EventsServicesImpl implements EventsServices {
 			throw new UncheckedPersistenceException("Error retrieving Event from the DataBase: "+ e1.getMessage());
 		}
 		
-		Gson gson = new GsonBuilder().create();
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 		
 		return gson.toJson(event, Event.class);
 		
