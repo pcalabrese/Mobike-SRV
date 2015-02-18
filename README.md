@@ -2,4 +2,4 @@
 Repository for Mobike Server APP
 
 link to our webpage
-http://mobike.ddns.net/WAPP
+http://mobike.ddns.net/WAPP/landing
