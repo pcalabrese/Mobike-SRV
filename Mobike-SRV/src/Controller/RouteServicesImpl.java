@@ -60,7 +60,7 @@ import com.google.gson.*;
 				}
 			
 				catch (Exception e){
-					throw new UncheckedFilesystemException("Error saving file to filesystem",e);
+					throw new UncheckedFilesystemException("Error saving file to filesystem" + e.getMessage(),e);
 				}
 			
 				if(url != null){
@@ -69,7 +69,7 @@ import com.google.gson.*;
 						insertedId = routeRep.addRoute(r);
 					}
 					catch (Exception e){
-						throw new UncheckedPersistenceException("Error adding route to database", e);
+						throw new UncheckedPersistenceException("Error adding route to database" + e.getMessage(),e);
 					}
 				}
 				else {

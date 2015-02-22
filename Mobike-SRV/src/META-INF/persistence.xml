@@ -9,8 +9,8 @@
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://192.168.10.100:3306/mobike"/>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
 			<property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
-			<property name="javax.persistence.jdbc.user" value="paolo"/>
-			<property name="javax.persistence.jdbc.password" value="psql2015_pbma"/>
+			<property name="javax.persistence.jdbc.user" value="mobikeSRV"/>
+			<property name="javax.persistence.jdbc.password" value="m0SRV2015_pbma"/>
 		</properties>
 	</persistence-unit>
 </persistence>

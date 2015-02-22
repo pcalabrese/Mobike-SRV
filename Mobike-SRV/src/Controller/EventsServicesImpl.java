@@ -51,7 +51,7 @@ public class EventsServicesImpl implements EventsServices {
 			insertedId = eventRep.addEvent(e);
 		}
 		catch (Exception e1){
-			throw new UncheckedPersistenceException("Error adding event to the DataBase");
+			throw new UncheckedPersistenceException("Error adding event to the DataBase" + e1.getMessage());
 		}
 		
 		return ""+insertedId+"";
@@ -72,7 +72,7 @@ public class EventsServicesImpl implements EventsServices {
 			allEvents = eventRep.getAllEvents();
 		} 
 		catch (Exception e1){
-			throw new UncheckedPersistenceException("Error retrieving allEvents from the DataBase");
+			throw new UncheckedPersistenceException("Error retrieving allEvents from the DataBase" + e1.getMessage());
 		}
 		
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();

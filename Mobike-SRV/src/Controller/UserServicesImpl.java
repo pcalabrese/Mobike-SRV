@@ -37,7 +37,7 @@ public class UserServicesImpl implements UserServices {
 				u = userRep.userFromId(id);
 			}
 			catch(Exception e){
-				throw new UncheckedPersistenceException("Error accessing user database");
+				throw new UncheckedPersistenceException("Error accessing user database" + e.getMessage());
 			}
 			
 			Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
@@ -68,7 +68,7 @@ public class UserServicesImpl implements UserServices {
 			insertedId = userRep.addUser(u);
 		}
 		catch (Exception e){
-			throw new UncheckedPersistenceException("Error adding user in database");
+			throw new UncheckedPersistenceException("Error adding user in database" + e.getMessage());
 		}
 		
 		return "" + insertedId + "";
@@ -100,7 +100,7 @@ public class UserServicesImpl implements UserServices {
 			exists = userRep.userExists(u.getEmail());
 		}
 		catch (Exception e){
-			throw new UncheckedPersistenceException("Error checking user account");
+			throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 		}
 		if(exists){
 			try {
@@ -108,7 +108,7 @@ public class UserServicesImpl implements UserServices {
 				id = String.valueOf(u1.getId());
 			}
 			catch (Exception e){
-				throw new UncheckedPersistenceException("Error checking user account");
+				throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 			}
 		}
 		else {
@@ -116,7 +116,7 @@ public class UserServicesImpl implements UserServices {
 				 id = String.valueOf(userRep.addUser(u));
 			 }
 			 catch (Exception e){
-					throw new UncheckedPersistenceException("Error checking user account");
+					throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 				}
 		}
 		
