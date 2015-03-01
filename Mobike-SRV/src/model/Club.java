@@ -34,21 +34,20 @@ import javax.xml.bind.annotation.XmlTransient;
  * @author Paolo
  */
 @Entity
-@Table(name = "events")
+@Table(name = "clubs")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "Event.findAll", query = "SELECT e FROM Event e"),
-    @NamedQuery(name = "Event.findById", query = "SELECT e FROM Event e WHERE e.id = :id"),
-    @NamedQuery(name = "Event.findByName", query = "SELECT e FROM Event e WHERE e.name = :name"),
-    @NamedQuery(name = "Event.findByStartdate", query = "SELECT e FROM Event e WHERE e.startdate = :startdate"),
-    @NamedQuery(name = "Event.findByStartlocation", query = "SELECT e FROM Event e WHERE e.startlocation = :startlocation"),
-    @NamedQuery(name = "Event.findByCreationdate", query = "SELECT e FROM Event e WHERE e.creationdate = :creationdate")})
-public class Event implements Serializable {
+    @NamedQuery(name = "Club.findAll", query = "SELECT c FROM Club c"),
+    @NamedQuery(name = "Club.findById", query = "SELECT c FROM Club c WHERE c.id = :id"),
+    @NamedQuery(name = "Club.findByName", query = "SELECT c FROM Club c WHERE c.name = :name"),
+    @NamedQuery(name = "Club.findByCreationdate", query = "SELECT c FROM Club c WHERE c.creationdate = :creationdate"),
+    @NamedQuery(name = "Club.findByLocation", query = "SELECT c FROM Club c WHERE c.location = :location")})
+public class Club implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    @TableGenerator(name="eventGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="EVENT_ID",allocationSize=1)
-    @GeneratedValue(strategy=GenerationType.TABLE, generator="eventGen")
+    @TableGenerator(name="clubGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="CLUB_ID",allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.TABLE, generator="clubGen")
     @Basic(optional = false)
     @Column(name = "id")
     private Long id;
@@ -61,55 +60,45 @@ public class Event implements Serializable {
     @Column(name = "description")
     private String description;
     
-    @Basic(optional = false)
-    @Column(name = "startdate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startdate;
-    
-    @Column(name = "startlocation")
-    private String startlocation;
-    
     @Column(name = "creationdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationdate;
     
-    @JoinTable(name = "users_participatein_events", joinColumns = {
-        @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "users_id", referencedColumnName = "id")})
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<User> usersAccepted;
+    @Column(name = "location")
+    private String location;
     
-    @JoinTable(name = "users_invitedin_events", joinColumns = {
-        @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
-        @JoinColumn(name = "users_id", referencedColumnName = "id")})
-    @ManyToMany(fetch = FetchType.EAGER)
-    private List<User> usersInvited;
-    
-    @JoinTable(name = "users_refused_events", joinColumns = {
-        @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
+    @JoinTable(name = "users_refused_clubs", joinColumns = {
+        @JoinColumn(name = "clubs_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "users_id", referencedColumnName = "id")})
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> usersRefused;
     
+    @JoinTable(name = "clubs_has_users", joinColumns = {
+        @JoinColumn(name = "clubs_id", referencedColumnName = "id")}, inverseJoinColumns = {
+        @JoinColumn(name = "users_id", referencedColumnName = "id")})
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<User> usersAccepted;
+    
+    @JoinTable(name = "users_invitedin_clubs", joinColumns = {
+        @JoinColumn(name = "clubs_id", referencedColumnName = "id")}, inverseJoinColumns = {
+        @JoinColumn(name = "users_id", referencedColumnName = "id")})
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<User> usersInvited;
+    
     @JoinColumn(name = "users_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User owner;
-    
-    @JoinColumn(name = "routes_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
-    private Route route;
 
-    public Event() {
+    public Club() {
     }
 
-    public Event(Long id) {
+    public Club(Long id) {
         this.id = id;
     }
 
-    public Event(Long id, String name, Date startdate) {
+    public Club(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.startdate = startdate;
     }
 
     public Long getId() {
@@ -136,28 +125,29 @@ public class Event implements Serializable {
         this.description = description;
     }
 
-    public Date getStartdate() {
-        return startdate;
-    }
-
-    public void setStartdate(Date startdate) {
-        this.startdate = startdate;
-    }
-
-    public String getStartlocation() {
-        return startlocation;
-    }
-
-    public void setStartlocation(String startlocation) {
-        this.startlocation = startlocation;
-    }
-
     public Date getCreationdate() {
         return creationdate;
     }
 
     public void setCreationdate(Date creationdate) {
         this.creationdate = creationdate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    @XmlTransient
+    public List<User> getUsersRefused() {
+        return usersRefused;
+    }
+
+    public void setUsersRefused(List<User> usersRefused) {
+        this.usersRefused = usersRefused;
     }
 
     @XmlTransient
@@ -178,29 +168,12 @@ public class Event implements Serializable {
         this.usersInvited = usersInvited;
     }
 
-    @XmlTransient
-    public List<User> getUserRefused() {
-        return usersRefused;
-    }
-
-    public void setUserRefused(List<User> userRefused) {
-        this.usersRefused = userRefused;
-    }
-
     public User getOwner() {
         return owner;
     }
 
     public void setOwner(User owner) {
         this.owner = owner;
-    }
-
-    public Route getRoute() {
-        return route;
-    }
-
-    public void setRoute(Route route) {
-        this.route = route;
     }
 
     @Override
@@ -213,10 +186,10 @@ public class Event implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Event)) {
+        if (!(object instanceof Club)) {
             return false;
         }
-        Event other = (Event) object;
+        Club other = (Club) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -225,7 +198,7 @@ public class Event implements Serializable {
 
     @Override
     public String toString() {
-        return "model.Event[ id=" + id + " ]";
+        return "model.Club[ id=" + id + " ]";
     }
     
 }
