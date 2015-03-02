@@ -4,6 +4,7 @@
 	<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<class>model.Club</class>
     	<class>model.Review</class>
+    	<class>model.ReviewPK</class>
     	<class>model.Event</class>
     	<class>model.Route</class>
     	<class>model.User</class>

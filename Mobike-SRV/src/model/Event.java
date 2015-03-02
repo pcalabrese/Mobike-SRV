@@ -8,6 +8,7 @@ package model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,9 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 /**
  *
  * @author Paolo
@@ -43,8 +47,13 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Event.findByStartdate", query = "SELECT e FROM Event e WHERE e.startdate = :startdate"),
     @NamedQuery(name = "Event.findByStartlocation", query = "SELECT e FROM Event e WHERE e.startlocation = :startlocation"),
     @NamedQuery(name = "Event.findByCreationdate", query = "SELECT e FROM Event e WHERE e.creationdate = :creationdate")})
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public interface EventListView { }
+    
+    public interface EventDetailedView { }
     
     @Id
     @TableGenerator(name="eventGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="EVENT_ID",allocationSize=1)

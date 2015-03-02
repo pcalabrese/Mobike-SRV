@@ -31,7 +31,7 @@ public interface RouteRepository {
 	 * @return Route
 	 * @throws PersistenceException
 	 */
-	public Route routeFromName(String name) throws PersistenceException;
+	public List<Route> routeFromName(String name) throws PersistenceException;
 
 	/**
 	 * @param p Route

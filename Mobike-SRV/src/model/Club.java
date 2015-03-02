@@ -8,6 +8,7 @@ package model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,9 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 /**
  *
  * @author Paolo
@@ -42,6 +46,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Club.findByName", query = "SELECT c FROM Club c WHERE c.name = :name"),
     @NamedQuery(name = "Club.findByCreationdate", query = "SELECT c FROM Club c WHERE c.creationdate = :creationdate"),
     @NamedQuery(name = "Club.findByLocation", query = "SELECT c FROM Club c WHERE c.location = :location")})
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Club implements Serializable {
     private static final long serialVersionUID = 1L;
     

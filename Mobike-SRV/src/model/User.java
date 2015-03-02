@@ -7,6 +7,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -25,6 +26,9 @@ import javax.persistence.TableGenerator;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 /**
  *
  * @author Paolo
@@ -40,8 +44,15 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "User.findByNickname", query = "SELECT u FROM User u WHERE u.nickname = :nickname"),
     @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email"),
     @NamedQuery(name = "User.findByBikemodel", query = "SELECT u FROM User u WHERE u.bikemodel = :bikemodel")})
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public interface UserNicknameView { }
+    
+    public interface UserPrivateView { }
+    
+    public interface UserPublicView { } 
     
     @Id
     @TableGenerator(name="userGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="USER_ID",allocationSize=1)

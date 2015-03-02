@@ -33,6 +33,9 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 /**
  *
  * @author Paolo
@@ -55,8 +58,14 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Route.findByBends", query = "SELECT r FROM Route r WHERE r.bends = :bends"),
     @NamedQuery(name = "Route.findByStartlocation", query = "SELECT r FROM Route r WHERE r.startlocation = :startlocation"),
     @NamedQuery(name = "Route.findByEndlocation", query = "SELECT r FROM Route r WHERE r.endlocation = :endlocation")})
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Route implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public interface RouteListView { }
+    
+    public interface RouteDetailedView { }
+    
     
     @Id
     @TableGenerator(name="routeGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="ROUTE_ID",allocationSize=1)
@@ -272,7 +281,21 @@ public class Route implements Serializable {
         this.eventList = eventList;
     }
 
-    @Override
+    /**
+	 * @return the gpxString
+	 */
+	public String getGpxString() {
+		return gpxString;
+	}
+
+	/**
+	 * @param gpxString the gpxString to set
+	 */
+	public void setGpxString(String gpxString) {
+		this.gpxString = gpxString;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

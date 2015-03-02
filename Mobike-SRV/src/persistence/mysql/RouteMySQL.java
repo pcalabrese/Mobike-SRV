@@ -1,6 +1,5 @@
 package persistence.mysql;
 
-import java.util.ArrayList;
 import java.util.List;
 import model.Route;
 import persistence.RouteRepository;
@@ -15,40 +14,58 @@ public class RouteMySQL implements RouteRepository{
 	
 	public RouteMySQL() {}
 	
+	/* metodo aggiornato,
+	 * rimosso l'utilizzo della getSingleResult()
+	 * in quanto se l'elemento non viene trovato nel DB solleva eccezione */
 	
 	@Override
 	public Route routeFromId(long id){
+		List<Route> results = null;
 		Route route = null;
-		TypedQuery<Route> query = em.createQuery("select r from Route r where r.id=:id",Route.class);
+		TypedQuery<Route> query = em.createNamedQuery("Route.findById", Route.class);
 		query.setParameter("id",id);
-		route =query.getSingleResult();
-		return route;
+		results = query.getResultList();
+		
+		if(results==null){
+			return route;
+		}
+		else {
+			if(!(results.isEmpty()))
+				return route = results.get(0);
+			else
+				return route;
+		}
 	}
 
-
-
-
+	/* 
+	 * metodo aggiornato,
+	 * se non ci sono Routes nel db allora restituisce null.*/
+	
 	@Override
 	public List<Route> getAllRoutes() {
 		
-		List<Route> routes = new ArrayList<Route>();
-		TypedQuery<Route> query = em.createQuery("select r from Route r",Route.class);
+		List<Route> routes = null;
+		TypedQuery<Route> query = em.createNamedQuery("Route.findAll",Route.class);
 		routes = query.getResultList();
+		
+		
 		return routes;
 	}
 
 
-
-
+	/* metodo aggiornato
+	 * restituisce la lista di Route corrispondenti a quel nome, 
+	 * dato che la colonna Name non è Unique.*/
+	
 	@Override
-	public Route routeFromName(String name) {
+	public List<Route> routeFromName(String name) {
 		
-		Route route = null;
-		Query query = em.createQuery("select r from Route r where r.name=:name");
+		List<Route> results = null;
+		TypedQuery<Route> query = em.createNamedQuery("Route.findbyName",Route.class);
 		query.setParameter("name",name);
-		route =(Route) query.getSingleResult();
+		results = query.getResultList();
 		
-		return route;
+		return results;
 	}
 
 
@@ -79,8 +96,7 @@ public class RouteMySQL implements RouteRepository{
 
 	@Override
 	public void removeRoute(Route p) {
-		
-		
+				
 		try{
 			em.getTransaction().begin();
 			Route route = em.find(Route.class,p.getId());
