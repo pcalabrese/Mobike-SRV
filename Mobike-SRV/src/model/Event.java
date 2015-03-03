@@ -27,10 +27,12 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
@@ -51,10 +53,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 public class Event implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    public interface EventListView { }
-    
-    public interface EventDetailedView { }
-    
+    @JsonView({Views.EventGeneralView.class, Views.UserEventRouteView.class})
     @Id
     @TableGenerator(name="eventGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="EVENT_ID",allocationSize=1)
     @GeneratedValue(strategy=GenerationType.TABLE, generator="eventGen")
@@ -62,48 +61,70 @@ public class Event implements Serializable {
     @Column(name = "id")
     private Long id;
     
+    @JsonView({Views.EventGeneralView.class, Views.UserEventRouteView.class})
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
     
+    @JsonView(Views.EventDetailView.class)
     @Lob
     @Column(name = "description")
     private String description;
     
+    @JsonView(Views.EventGeneralView.class)
     @Basic(optional = false)
     @Column(name = "startdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date startdate;
     
+    @JsonView(Views.EventGeneralView.class)
     @Column(name = "startlocation")
     private String startlocation;
     
+    @JsonView({Views.EventDetailView.class, Views.UserEventRouteView.class})
     @Column(name = "creationdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationdate;
     
+    @JsonView(Views.EventDetailView.class)
     @JoinTable(name = "users_participatein_events", joinColumns = {
         @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "users_id", referencedColumnName = "id")})
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> usersAccepted;
     
+    @JsonView(Views.EventDetailView.class)
     @JoinTable(name = "users_invitedin_events", joinColumns = {
         @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "users_id", referencedColumnName = "id")})
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> usersInvited;
     
+    @JsonView(Views.EventDetailView.class)
     @JoinTable(name = "users_refused_events", joinColumns = {
         @JoinColumn(name = "events_id", referencedColumnName = "id")}, inverseJoinColumns = {
         @JoinColumn(name = "users_id", referencedColumnName = "id")})
     @ManyToMany(fetch = FetchType.EAGER)
     private List<User> usersRefused;
     
+    @JsonView(Views.EventGeneralView.class)
+    @Transient
+    private int acceptedSize;
+    
+    @JsonView(Views.EventGeneralView.class)
+    @Transient
+    private int invitedSize;
+    
+    @JsonView(Views.EventGeneralView.class)
+    @Transient
+    private int refusedSize;
+    
+    @JsonView(Views.EventGeneralView.class)
     @JoinColumn(name = "users_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User owner;
     
+    @JsonView(Views.EventDetailView.class)
     @JoinColumn(name = "routes_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Route route;
@@ -196,7 +217,67 @@ public class Event implements Serializable {
         this.usersRefused = userRefused;
     }
 
-    public User getOwner() {
+    /**
+	 * @return the acceptedSize
+	 */
+	public int getAcceptedSize() {
+		return acceptedSize;
+	}
+
+	/**
+	 * @param acceptedSize the acceptedSize to set
+	 */
+	public void setAcceptedSize(int acceptedSize) {
+		this.acceptedSize = acceptedSize;
+	}
+	
+	public void setAcceptedSize(){
+		this.acceptedSize = this.usersAccepted.size();
+	}
+	
+	/**
+	 * @return the invitedSize
+	 */
+	public int getInvitedSize() {
+		return invitedSize;
+	}
+
+	/**
+	 * @param invitedSize the invitedSize to set
+	 */
+	public void setInvitedSize(int invitedSize) {
+		this.invitedSize = invitedSize;
+	}
+
+	public void setInvitedSize(){
+		this.invitedSize = this.usersInvited.size();
+	}
+	
+	/**
+	 * @return the refusedSize
+	 */
+	public int getRefusedSize() {
+		return refusedSize;
+	}
+
+	/**
+	 * @param refusedSize the refusedSize to set
+	 */
+	public void setRefusedSize(int refusedSize) {
+		this.refusedSize = refusedSize;
+	}
+	
+	public void setRefusedSize(){
+		this.refusedSize = this.usersRefused.size();
+	}
+	
+	public void setAllUsersSizes(){
+		this.acceptedSize = this.usersAccepted.size();
+		this.invitedSize = this.usersInvited.size();
+		this.refusedSize = this.usersRefused.size();
+	}
+
+	public User getOwner() {
         return owner;
     }
 

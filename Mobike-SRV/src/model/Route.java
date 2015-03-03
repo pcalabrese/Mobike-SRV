@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
@@ -62,11 +63,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 public class Route implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    public interface RouteListView { }
-    
-    public interface RouteDetailedView { }
-    
-    
+    @JsonView({Views.ItineraryGeneralView.class,Views.EventDetailView.class, Views.UserEventRouteView.class})
     @Id
     @TableGenerator(name="routeGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="ROUTE_ID",allocationSize=1)
     @GeneratedValue(strategy=GenerationType.TABLE, generator="routeGen")
@@ -74,64 +71,98 @@ public class Route implements Serializable {
     @Column(name = "id")
     private Long id;
     
+    @JsonView({Views.ItineraryGeneralView.class, Views.UserEventRouteView.class})
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @Lob
     @Column(name = "description")
     private String description;
     
+    
     @Column(name = "url")
     private String url;
     
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    
+    @JsonView({Views.ItineraryGeneralView.class,Views.EventDetailView.class})
     @Column(name = "length")
     private Double length;
     
+    @JsonView({Views.ItineraryGeneralView.class,Views.EventDetailView.class})
     @Column(name = "duration")
     private BigInteger duration;
     
+    @JsonView({Views.ItineraryDetailView.class, Views.UserEventRouteView.class})
     @Column(name = "uploaddate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date uploaddate;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "type")
     private String type;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "difficulty")
     private Integer difficulty;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "rating")
     private Integer rating;
-    
+
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "ratingnumber")
     private Integer ratingnumber;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "bends")
     private Integer bends;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "startlocation")
     private String startlocation;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "endlocation")
     private String endlocation;
     
+    @JsonView(Views.ItineraryGeneralView.class)
     @JoinColumn(name = "users_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User owner;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "route", fetch = FetchType.EAGER)
     private List<Review> reviewList;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "route", fetch = FetchType.EAGER)
     private List<Event> eventList;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @Transient
     private String gpxString;
     
+    @JsonView(Views.EventDetailView.class)
+    @Transient
+    private String imgUrl;
+    
 
-    public Route() {
+    /**
+	 * @return the imgUrl
+	 */
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	/**
+	 * @param imgUrl the imgUrl to set
+	 */
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+
+	public Route() {
     }
 
     public Route(Long id) {

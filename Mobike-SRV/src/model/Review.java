@@ -6,6 +6,7 @@
 package model;
 
 import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -18,6 +19,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.fasterxml.jackson.annotation.JsonView;
 
 /**
  *
@@ -35,6 +38,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Review implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @EmbeddedId
     protected ReviewPK reviewPK;
     
@@ -42,14 +46,17 @@ public class Review implements Serializable {
     @Column(name = "id")
     private long id;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @Lob
     @Column(name = "message")
     private String message;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @Basic(optional = false)
     @Column(name = "rate")
     private int rate;
     
+    @JsonView(Views.ItineraryDetailView.class)
     @JoinColumn(name = "users_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private User owner;

@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 /**
@@ -54,6 +55,7 @@ public class User implements Serializable {
     
     public interface UserPublicView { } 
     
+    @JsonView({Views.ItineraryGeneralView.class,Views.EventGeneralView.class, Views.UserGeneralView.class})
     @Id
     @TableGenerator(name="userGen",table="sequence_table",pkColumnName="SEQ_NAME",valueColumnName="SEQ_COUNT",pkColumnValue="USER_ID",allocationSize=1)
     @GeneratedValue(strategy=GenerationType.TABLE, generator="userGen")
@@ -61,26 +63,32 @@ public class User implements Serializable {
     @Column(name = "id")
     private Long id;
     
+    @JsonView(Views.UserDetailView.class)
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
     
+    @JsonView(Views.UserDetailView.class)
     @Basic(optional = false)
     @Column(name = "surname")
     private String surname;
     
+    @JsonView({Views.ItineraryGeneralView.class,Views.EventGeneralView.class, Views.UserGeneralView.class})
     @Basic(optional = false)
     @Column(name = "nickname")
     private String nickname;
     
+    @JsonView(Views.UserDetailView.class)
     @Basic(optional = false)
     @Column(name = "email")
     private String email;
+    
     
     @Lob
     @Column(name = "imgurl")
     private String imgurl;
     
+    @JsonView(Views.UserDetailView.class)
     @Column(name = "bikemodel")
     private String bikemodel;
     
@@ -96,18 +104,23 @@ public class User implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private List<Club> clubsOwned;
     
+    @JsonView(Views.UserDetailView.class)
     @ManyToMany(mappedBy = "usersRefused", fetch = FetchType.EAGER)
     private List<Event> eventsRefused;
     
+    @JsonView(Views.UserDetailView.class)
     @ManyToMany(mappedBy = "usersAccepted", fetch = FetchType.EAGER)
     private List<Event> eventsAccepted;
     
+    @JsonView(Views.UserDetailView.class)
     @ManyToMany(mappedBy = "usersInvited", fetch = FetchType.EAGER)
     private List<Event> eventsInvited;
     
+    @JsonView(Views.UserEventRouteView.class)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private List<Event> eventsOwned;
    
+    @JsonView(Views.UserEventRouteView.class)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private List<Route> routeList;
     
