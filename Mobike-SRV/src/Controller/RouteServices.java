@@ -16,7 +16,7 @@ public interface RouteServices{
 	 * @param json
 	 * @return String
 	 */
-	public String createRoute(String json);
+	public Response createRoute(String wrappingJson);
 	
 	/**
 	 * @param id

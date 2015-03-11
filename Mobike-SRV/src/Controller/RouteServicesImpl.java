@@ -2,11 +2,15 @@ package Controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import persistence.RouteRepository;
+import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.RouteMySQL;
+import persistence.mysql.UserMySQL;
 import persistence.fs.*;
+import utils.Crypter;
 import model.Route;
 import model.Views;
 
@@ -50,15 +54,36 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		 * @version 3.1
 		 * 
 		 */
+		@SuppressWarnings("unchecked")
 		@POST
 		@Path("/create")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.TEXT_PLAIN)
-		public String createRoute(String json){
-				//Gson gson = new GsonBuilder().create();
-				//Route r = gson.fromJson(json, Route.class);
-
+		public Response createRoute(String wrappingJson){
+			
+			if(wrappingJson!=null){
 				ObjectMapper mapper = new ObjectMapper();
+				Map<String,String> map = null;
+				
+				try {
+					map = (Map<String,String>) mapper.readValue(wrappingJson, Map.class);
+				} catch (IOException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				String cryptedJson = null;
+				cryptedJson = map.get("route");
+				
+				Crypter crypter = new Crypter();
+				
+				String json = null;
+				try {
+					json = crypter.decrypt(cryptedJson);
+				} catch (Exception e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				
 				Route route = null;
 				
 				try {
@@ -68,34 +93,55 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 					e1.printStackTrace();
 				}
 				
-				System.out.println(route.getName() + "" + route.getDescription() + "" + route.getStartlocation() + route.getEndlocation());
-				String gpxString = route.getGpxString();
-				String url = null;
-				long insertedId = -1;
-				
-				 try {
-					RouteIO writer = new GpxIO();
-					url = writer.write(gpxString, route.getName());
+				UserRepository userRepo= new UserMySQL();
+				boolean exists = false;
+				try {
+					exists = userRepo.userExists(route.getOwner().getId(), route.getOwner().getNickname());
+				} catch (PersistenceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
-			
-				catch (Exception e){
-					throw new UncheckedFilesystemException("Error saving file to filesystem" + e.getMessage(),e);
-				}
-			
-				if(url != null){
-					route.setUrl(url);
+				if(exists){
+							
+					String gpxString = route.getGpxString();
+					String url = null;
+					long insertedId = -1;
+					
 					try {
-						insertedId = routeRep.addRoute(route);
+						RouteIO writer = new GpxIO();
+						url = writer.write(gpxString, route.getName());
 					}
+					
 					catch (Exception e){
-						throw new UncheckedPersistenceException("Error adding route to database" + e.getMessage(),e);
+						throw new UncheckedFilesystemException("Error saving file to filesystem" + e.getMessage(),e);
 					}
+					
+					if(url != null){
+						route.setUrl(url);
+						try {
+							insertedId = routeRep.addRoute(route);
+							
+						}
+						catch (Exception e){
+							throw new UncheckedPersistenceException("Error adding route to database" + e.getMessage(),e);
+						}
+					}
+					else {
+						throw new UncheckedFilesystemException("GPX Url not reachable");
+					}
+					
+					String outputId = ""+insertedId+"";
+					return Response.ok(outputId,MediaType.TEXT_PLAIN).build();
 				}
-				else {
-					throw new UncheckedFilesystemException("GPX Url not reachable");
+				else{
+					
+					return Response.status(401).build();
 				}
-				return "" +insertedId +"";
-			
+				
+			}
+			else{
+				return Response.status(400).build();
+			}
 		}
 		
 		/**
@@ -115,7 +161,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		@Override
 		public Response getRoute(@PathParam("Id") Long id) {
 			
-			System.out.println(id);
+			
 			String json = null;
 			Route route = null;
 			RouteRepository routeREP = new RouteMySQL();
