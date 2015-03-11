@@ -121,9 +121,22 @@ public class UserMySQL implements UserRepository {
 		if(!(query.getResultList().isEmpty()))
 			output = true;
 		
-		return output;
-			
+		return output;	
+	}
 	
+	@Override
+	public boolean userExists(long id, String nickname) throws PersistenceException {
+		boolean output = false;
+		TypedQuery<User> query = em.createNamedQuery("User.findByIdAndNickname", User.class);
+		query.setParameter("id",id);
+		query.setParameter("nickname", nickname);
+		List<User> results = query.getResultList();
+		
+		if(!(results.isEmpty()))
+			if(results.get(0).getId()==id & results.get(0).getNickname()==nickname)
+				output = true;
+		
+		return output;
 		
 	}
 

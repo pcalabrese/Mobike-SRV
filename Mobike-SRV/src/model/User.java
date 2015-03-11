@@ -44,7 +44,8 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
     @NamedQuery(name = "User.findBySurname", query = "SELECT u FROM User u WHERE u.surname = :surname"),
     @NamedQuery(name = "User.findByNickname", query = "SELECT u FROM User u WHERE u.nickname = :nickname"),
     @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email"),
-    @NamedQuery(name = "User.findByBikemodel", query = "SELECT u FROM User u WHERE u.bikemodel = :bikemodel")})
+    @NamedQuery(name = "User.findByBikemodel", query = "SELECT u FROM User u WHERE u.bikemodel = :bikemodel"),
+    @NamedQuery(name = "User.findByIdAndNickname", query = "SELECT u FROM User u WHERE u.id = :id AND u.nickname = :nickname")})
 @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;

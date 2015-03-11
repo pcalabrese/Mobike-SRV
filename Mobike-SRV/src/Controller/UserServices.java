@@ -21,12 +21,12 @@ public interface UserServices{
 	/** 
 	 * @return String
 	 */
-	public String getAllUsers();
+	public Response getAllUsers(String cryptedJson);
 	
 	/**
 	 * @return String
 	 */
-	public String createUser(String json);
+	public Response createUser(String cryptedJson);
 
 	/**
 	 * @param id
