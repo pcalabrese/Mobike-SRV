@@ -1,5 +1,7 @@
 package Controller;
 
+import javax.ws.rs.core.Response;
+
 // test comments for controllermain
 
 /** 
@@ -14,7 +16,7 @@ public interface UserServices{
 	 * @param long id
 	 * @return String (JSON of USER)
 	 */
-	public String getUser(long id, String token);
+	public Response getUser(long id, String token);
 	
 	/** 
 	 * @return String
@@ -37,6 +39,8 @@ public interface UserServices{
 	 * @return String
 	 */
 	public String getUserEvents(long id);
+	
+	public Response authenticateUser(String Cryptedjson);
 
 	
 	

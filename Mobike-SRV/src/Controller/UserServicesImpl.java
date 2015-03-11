@@ -4,6 +4,7 @@ import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.UserMySQL;
 import model.User;
+import model.Views;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -13,12 +14,36 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
+import com.sun.org.apache.xerces.internal.util.Status;
+
+import utils.Crypter;
+
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 @Path("/users")
 public class UserServicesImpl implements UserServices {
-
+	
 	protected UserRepository userRep;
 	
 	public UserServicesImpl() {
@@ -28,24 +53,60 @@ public class UserServicesImpl implements UserServices {
 	
 	@Override
 	@GET
-	@Path("/getUser")
+	@Path("/getDetails")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUser(@NotNull @QueryParam("id") long id, @NotNull @QueryParam("token") String token) {
-		if(token.equals("MW21B4YS4VEEZ5M1CDTBRYBC2FESXWKOXQBV92EAB591CA5CDC77D6E787E596F5E")){
-			User u = null;
-			try {
-				u = userRep.userFromId(id);
-			}
-			catch(Exception e){
-				throw new UncheckedPersistenceException("Error accessing user database" + e.getMessage());
-			}
+	public Response getUser(@NotNull @QueryParam("id") long id, @NotNull @QueryParam("token") String cryptedJson) {
 			
-			Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-			return gson.toJson(u, User.class);
-		}
-		else{
-			throw new UncheckedPersistenceException("Request not Valid");
-		}
+			if(cryptedJson != null){
+				Crypter crypter = new Crypter();
+				String json = null;
+				try {
+					json = crypter.decrypt(cryptedJson);
+				} catch (Exception e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				User user = null;
+				
+				try {
+					user = mapper.readValue(json, User.class);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				if(user.getId()==id){
+					User user1 = null;
+					try{
+						
+						user1 = userRep.userFromId(id);
+					}
+					catch(Exception e){
+						throw new UncheckedPersistenceException("Error accessing user database" + e.getMessage());
+					}
+					
+					mapper.setConfig(mapper.getSerializationConfig().withView(Views.UserDetailView.class));
+					String jsonOutput = null;
+					try {
+						jsonOutput = mapper.writerWithView(Views.UserDetailView.class).writeValueAsString(user1);
+					} catch (JsonProcessingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					return Response.ok(jsonOutput, MediaType.APPLICATION_JSON).build();
+				}
+				else {
+					return Response.status(401).build();
+				}
+				
+				
+			}
+			else {
+				return Response.status(400).build();
+			}
+
+		
 		
 	}
 
@@ -86,41 +147,78 @@ public class UserServicesImpl implements UserServices {
 		return null;
 	}
 
-	@POST
+	@Override
+	@GET
 	@Path("/auth")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String authenticateUser(String json){
-		Gson gson = new GsonBuilder().create();
-		User u = gson.fromJson(json, User.class);
-		boolean exists;
-		User u1 = null;
-		String id;
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authenticateUser(@QueryParam("token") String cryptedJson){
 		
-		try {
-			exists = userRep.userExists(u.getEmail());
-		}
-		catch (Exception e){
-			throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
-		}
-		if(exists){
+		ObjectMapper mapper = new ObjectMapper();
+		System.out.println(cryptedJson);
+		
+		//if the map contains a field named "token" the request is correct and then we can go on with the decryption
+		if(cryptedJson != null){
+			
+			// here i decrypt the String and build the User POJO to query the persistence
+			Crypter crypter = new Crypter();
+			String json = null;
 			try {
-				u1 = userRep.userFromEmail(u.getEmail());
-				id = String.valueOf(u1.getId());
+				json = crypter.decrypt(cryptedJson);
+				System.out.println(json);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			User user = null;
+			try {
+				user = mapper.readValue(json, User.class);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			boolean exists;
+			try {
+				exists = userRep.userExists(user.getEmail());
 			}
 			catch (Exception e){
 				throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 			}
-		}
-		else {
-			 try{
-				 id = String.valueOf(userRep.addUser(u));
-			 }
-			 catch (Exception e){
+			
+			//if user exists we can get it from the database 
+			if(exists){
+				User user1;
+				try {
+					user1 = userRep.userFromEmail(user.getEmail());	
+				}
+				catch (Exception e){
 					throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 				}
+				
+				mapper.setConfig(mapper.getSerializationConfig().withView(Views.UserGeneralView.class));
+				mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+				
+				String jsonOutput = null;
+				try {
+					jsonOutput = mapper.writerWithView(Views.UserGeneralView.class).writeValueAsString(user1);
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.ok(jsonOutput, MediaType.APPLICATION_JSON).build();
+				
+				
+				
+			}
+			else {
+				return Response.status(401).build();	
+			}
 		}
+			
 		
-		return id;
+		else{
+			return Response.status(400).build();
+		}
 	}
-
+		
 }
