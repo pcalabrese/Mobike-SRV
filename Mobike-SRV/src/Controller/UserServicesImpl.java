@@ -2,9 +2,11 @@ package Controller;
 
 import persistence.UserRepository;
 import persistence.exception.*;
+import persistence.mysql.RouteMySQL;
 import persistence.mysql.UserMySQL;
 import model.User;
 import model.Views;
+
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,16 +16,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
+
 import utils.Crypter;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 
+/** 
+ * RESTful User Endpoint
+ * @author Paolo, Bruno, Marco, Andrea
+ * @version 3.0
+ * @see UserServices UserServices: Interface implemented by this class
+ * @see UserMySQL UserMySQL: SQL DAO Class
+ *
+ */
 @Path("/users")
 public class UserServicesImpl implements UserServices {
 	

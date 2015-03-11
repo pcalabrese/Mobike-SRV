@@ -24,9 +24,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
+
 /** 
- * Main RESTful Controller for HTTP POST and GET requests
+ * RESTful Route Endpoint
  * @author Paolo, Bruno, Marco, Andrea
  * @version 3.0
  * @see RouteServices RouteServices: Interface implemented by this class
@@ -47,8 +47,7 @@ import com.google.gson.*;
 		 * @param json JSON file containing the Route Details formatted in this way: Route [id=" + id + ", name=" + name + ", creatorEmail=" + creatorEmail + ", duration=" + duration + ", length=" + length +", uploadDate=" + uploadDate +", description=" + description +", url=" + url + ", gpxString=" + gpxString + "]";
 		 * @return String containing the ID of the created route
 		 * @see Route Route: Model Class
-		 * @see Gson
-		 * @version 2.1
+		 * @version 3.1
 		 * 
 		 */
 		@POST
@@ -58,20 +57,17 @@ import com.google.gson.*;
 		public String createRoute(String json){
 				//Gson gson = new GsonBuilder().create();
 				//Route r = gson.fromJson(json, Route.class);
+
 				ObjectMapper mapper = new ObjectMapper();
 				Route route = null;
+				
 				try {
 					route = mapper.readValue(json, Route.class);
-				} catch (JsonParseException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (JsonMappingException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				
 				System.out.println(route.getName() + "" + route.getDescription() + "" + route.getStartlocation() + route.getEndlocation());
 				String gpxString = route.getGpxString();
 				String url = null;
@@ -105,11 +101,12 @@ import com.google.gson.*;
 		/**
 		 * Method to retrieve a Route by the id
 		 * @param id Long ID of the requested Route
-		 * @return JSON formatted Route
+		 * @return Response OK: json formatted Route, FAIL: Error404
 		 * @see Route Route: Model Class
 		 * @see RouteMySql RouteMySql: SQL DAO Class
-		 * @see Gson
-		 * @version 2.1
+		 * @see GpxIO GpxIO: class to read and write from and to file in the server filesystem
+		 * @see Views.ItineraryDetailView Views.ItineraryDetailView: View for detailed information about Route
+		 * @version 3.1
 		 * 
 		 */
 		@GET
@@ -173,8 +170,9 @@ import com.google.gson.*;
 		/**
 		 * Method to retrieve a Route by the id
 		 * @param id Long ID
-		 * @return JSON formatted Route
-		 * @version 2.1
+		 * @return Response OK: json formatted Routes, FAIL: Error404
+		 * @see Views.ItineraryGeneralView Views.ItineraryGeneralView: General View to visualize a list of Routes
+		 * @version 3.1
 		 * 
 		 */
 		@GET
