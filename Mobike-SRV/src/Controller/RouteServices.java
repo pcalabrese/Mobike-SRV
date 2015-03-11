@@ -1,12 +1,14 @@
 package Controller;
 
+import javax.ws.rs.core.Response;
+
 // test comments for controllermain
 
 /** 
  * Main Controller interface
  * @author Paolo, Bruno, Marco, Andrea
  * @see RouteServicesImpl Controller.RouteServicesImpl: implemented class
- * @version 2.0
+ * @version 3.0
  */
 public interface RouteServices{
 	
@@ -20,12 +22,12 @@ public interface RouteServices{
 	 * @param id
 	 * @return String
 	 */
-	public String getRoute(Long id);
+	public Response getRoute(Long id);
 	
 	/**
 	 * @return String
 	 */
-	public String retrieveAllRoutes();
+	public Response retrieveAllRoutes();
 
 	/**
 	 * @param id
