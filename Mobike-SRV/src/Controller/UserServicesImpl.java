@@ -2,6 +2,7 @@ package Controller;
 
 import persistence.UserRepository;
 import persistence.exception.*;
+import persistence.mysql.RouteMySQL;
 import persistence.mysql.UserMySQL;
 import model.User;
 import model.Views;
@@ -29,6 +30,14 @@ import java.util.List;
 import java.util.Map;
 
 
+/** 
+ * RESTful User Endpoint
+ * @author Paolo, Bruno, Marco, Andrea
+ * @version 3.0
+ * @see UserServices UserServices: Interface implemented by this class
+ * @see UserMySQL UserMySQL: SQL DAO Class
+ *
+ */
 @Path("/users")
 public class UserServicesImpl implements UserServices {
 	
