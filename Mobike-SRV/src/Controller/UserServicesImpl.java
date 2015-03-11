@@ -5,7 +5,6 @@ import persistence.exception.*;
 import persistence.mysql.UserMySQL;
 import model.User;
 import model.Views;
-
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -15,31 +14,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
-import com.sun.org.apache.xerces.internal.util.Status;
-
 import utils.Crypter;
-
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 @Path("/users")
 public class UserServicesImpl implements UserServices {
@@ -154,17 +137,12 @@ public class UserServicesImpl implements UserServices {
 	public Response authenticateUser(@QueryParam("token") String cryptedJson){
 		
 		ObjectMapper mapper = new ObjectMapper();
-		System.out.println(cryptedJson);
-		
-		//if the map contains a field named "token" the request is correct and then we can go on with the decryption
+
 		if(cryptedJson != null){
-			
-			// here i decrypt the String and build the User POJO to query the persistence
 			Crypter crypter = new Crypter();
 			String json = null;
 			try {
 				json = crypter.decrypt(cryptedJson);
-				System.out.println(json);
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -185,7 +163,6 @@ public class UserServicesImpl implements UserServices {
 				throw new UncheckedPersistenceException("Error checking user account" + e.getMessage());
 			}
 			
-			//if user exists we can get it from the database 
 			if(exists){
 				User user1;
 				try {
@@ -205,7 +182,25 @@ public class UserServicesImpl implements UserServices {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				return Response.ok(jsonOutput, MediaType.APPLICATION_JSON).build();
+				String cryptedOutput = null;
+				try {
+					cryptedOutput = crypter.encrypt(jsonOutput);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				Map<String,String> map = new HashMap<String,String>();
+				map.put("user", cryptedOutput);
+				mapper = new ObjectMapper();
+				String cryptedjsonOutput = null;
+				try {
+					cryptedjsonOutput = mapper.writeValueAsString(map);
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return Response.ok(cryptedjsonOutput, MediaType.APPLICATION_JSON).build();
 				
 				
 				
