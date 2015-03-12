@@ -22,7 +22,7 @@ public interface EventsServices{
 	 * @param id
 	 * @return String
 	 */
-	public String getEvent(Long id);
+	public Response getEvent(Long id);
 	
 	/**
 	 * @return String
@@ -34,6 +34,8 @@ public interface EventsServices{
 	 * @return String
 	 */
 	public String associateRoute(Long id);
+
+	public Response removeEvent(String cryptedJson);
 	
 	
 	
