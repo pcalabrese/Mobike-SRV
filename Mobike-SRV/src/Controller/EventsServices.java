@@ -34,6 +34,8 @@ public interface EventsServices{
 	 * @return String
 	 */
 	public String associateRoute(Long id);
+
+	public Response removeEvent(String cryptedJson);
 	
 	
 	
