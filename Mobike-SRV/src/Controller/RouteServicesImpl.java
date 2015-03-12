@@ -1,6 +1,7 @@
 package Controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -201,10 +200,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 				e.printStackTrace();
 					}
 			
-			/*Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-			System.out.println(route.getUrl());
-			return gson.toJson(route, Route.class);*/
-			return Response.ok(json, MediaType.APPLICATION_JSON).build();
+			Crypter crypter = new Crypter();
+			String cryptedJson = null;
+			try {
+				cryptedJson = crypter.encrypt(json);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("route", cryptedJson);
+			
+			objectMapper = new ObjectMapper();
+			String outputJson = null;
+			try {
+				outputJson = objectMapper.writeValueAsString(map);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
 			}
 			// route=null -> id doesnt exist in the DB
 			else {
@@ -250,7 +267,27 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 				e.printStackTrace();					
 					}
 			
-			return Response.ok(json, MediaType.APPLICATION_JSON).build(); 
+			Crypter crypter = new Crypter();
+			String cryptedJson = null;
+			try {
+				cryptedJson = crypter.encrypt(json);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("routes", cryptedJson);
+			objectMapper = new ObjectMapper();
+			String outputJson = null;
+			
+			try {
+				outputJson = objectMapper.writeValueAsString(map);
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+				
+			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build(); 
 			}
 			
 			else {

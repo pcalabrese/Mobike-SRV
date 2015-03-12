@@ -2,11 +2,9 @@ package Controller;
 
 import persistence.UserRepository;
 import persistence.exception.*;
-import persistence.mysql.RouteMySQL;
 import persistence.mysql.UserMySQL;
 import model.User;
 import model.Views;
-
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,14 +14,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
-
 import utils.Crypter;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -265,7 +259,7 @@ public class UserServicesImpl implements UserServices {
 						e1.printStackTrace();
 					}
 					
-					Map<String,String> map1 = null;
+					Map<String,String> map1 = new HashMap<String,String>();
 					map1.put("user", cryptedInsertedUserJson);
 					
 					String jsonOutput = null;
@@ -297,13 +291,13 @@ public class UserServicesImpl implements UserServices {
 
 	@Override
 	public String getUserRoutes(long id) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
 	@Override
 	public String getUserEvents(long id) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

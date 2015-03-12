@@ -1,5 +1,7 @@
 package Controller;
 
+import javax.ws.rs.core.Response;
+
 // test comments for controllermain
 
 /** 
@@ -14,7 +16,7 @@ public interface EventsServices{
 	 * @param json
 	 * @return String
 	 */
-	public String createEvent(String json);
+	public Response createEvent(String wrappingJson);
 	
 	/**
 	 * @param id
@@ -25,7 +27,7 @@ public interface EventsServices{
 	/**
 	 * @return String
 	 */
-	public String retrieveAllEvents();
+	public Response retrieveAllEvents();
 
 	/**
 	 * @param id

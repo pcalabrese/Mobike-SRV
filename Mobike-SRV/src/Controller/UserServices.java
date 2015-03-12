@@ -28,6 +28,10 @@ public interface UserServices{
 	 */
 	public Response createUser(String cryptedJson);
 
+	
+	
+	public Response authenticateUser(String Cryptedjson);
+
 	/**
 	 * @param id
 	 * @return String
@@ -39,10 +43,6 @@ public interface UserServices{
 	 * @return String
 	 */
 	public String getUserEvents(long id);
-	
-	public Response authenticateUser(String Cryptedjson);
-
-	
 	
 	
 	
