@@ -22,7 +22,7 @@ public interface EventsServices{
 	 * @param id
 	 * @return String
 	 */
-	public String getEvent(Long id);
+	public Response getEvent(Long id);
 	
 	/**
 	 * @return String

@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.*;
 
 /**
  * @author Paolo
@@ -186,20 +185,67 @@ public class EventsServicesImpl implements EventsServices {
 	@GET
 	@Path("/retrieve/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getEvent(@PathParam("id") Long id){
+	public Response getEvent(@PathParam("id") Long id){
 		Event event = null;
-		System.out.println(id);
+		String json = null;
+		EventRepository eventRep = new EventMySQL();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		//take Event from db
 		try {
 			event = eventRep.eventFromId(id);
 		}
-		catch (Exception e1){
-			System.out.println("errore");
-			throw new UncheckedPersistenceException("Error retrieving Event from the DataBase: "+ e1.getMessage());
+			catch (Exception e1){
+				throw new UncheckedPersistenceException("Error retrieving Event from the DataBase: "+ e1.getMessage());
+			}
+		
+		if(event!=null){
+			
+			//set the view
+			objectMapper.setConfig(objectMapper.getSerializationConfig().withView(Views.EventDetailView.class));
+			objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+			
+			//starting JSON serialization
+			try {
+				json = objectMapper.writerWithView(Views.EventDetailView.class).writeValueAsString(event);
+			} 	catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			
+			//inizialize Crypter and JSON encrypted string
+			Crypter crypter = new Crypter();
+			String cryptedJson = null;
+			
+			//start encrypting JSON
+			try {
+				cryptedJson = crypter.encrypt(json);
+			} 	catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("event", cryptedJson);
+			
+			objectMapper = new ObjectMapper();
+			String outputJson = null;
+			
+			try {
+				outputJson = objectMapper.writeValueAsString(map);
+			} 	catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				}
+			
+		return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
+		
 		}
 		
-		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-		
-		return gson.toJson(event, Event.class);
+		// event=null -> id doesnt exist in the db
+		else {
+			return Response.status(404).build();
+		}
 		
 	}
 
@@ -213,3 +259,18 @@ public class EventsServicesImpl implements EventsServices {
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
