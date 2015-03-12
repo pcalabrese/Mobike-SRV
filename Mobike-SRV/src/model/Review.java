@@ -34,7 +34,8 @@ import com.fasterxml.jackson.annotation.JsonView;
     @NamedQuery(name = "Review.findById", query = "SELECT r FROM Review r WHERE r.id = :id"),
     @NamedQuery(name = "Review.findByRate", query = "SELECT r FROM Review r WHERE r.rate = :rate"),
     @NamedQuery(name = "Review.findByUsersId", query = "SELECT r FROM Review r WHERE r.reviewPK.usersId = :usersId"),
-    @NamedQuery(name = "Review.findByRoutesId", query = "SELECT r FROM Review r WHERE r.reviewPK.routesId = :routesId")})
+    @NamedQuery(name = "Review.findByRoutesId", query = "SELECT r FROM Review r WHERE r.reviewPK.routesId = :routesId"),
+    @NamedQuery(name = "Review.findByRoutesIdUsersId", query ="SELECT r from Review r WHERE r.reviewPK.usersId = :usersId AND r.reviewPK.routesId = :routesId")})
 public class Review implements Serializable {
     private static final long serialVersionUID = 1L;
     
