@@ -316,9 +316,7 @@ public class UserServicesImpl implements UserServices {
 	@Path("/auth")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticateUser(@QueryParam("token") String cryptedJson) {
-
 		ObjectMapper mapper = new ObjectMapper();
-
 		if (cryptedJson != null) {
 			Crypter crypter = new Crypter();
 			String json = null;
@@ -328,7 +326,7 @@ public class UserServicesImpl implements UserServices {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
+			
 			User user = null;
 			try {
 				user = mapper.readValue(json, User.class);
@@ -336,25 +334,59 @@ public class UserServicesImpl implements UserServices {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			boolean exists;
-			try {
-				exists = userRep.userExists(user.getEmail());
-			} catch (Exception e) {
-				throw new UncheckedPersistenceException(
-						"Error checking user account" + e.getMessage());
-			}
-
-			if (exists) {
-				User user1;
+			
+			
+			User user1 = null;
+			if(user.getEmail()!=null){
+				boolean exists = false;
 				try {
-					user1 = userRep.userFromEmail(user.getEmail());
+					exists = userRep.userExists(user.getEmail());
 				} catch (Exception e) {
 					throw new UncheckedPersistenceException(
-							"Error checking user account" + e.getMessage());
+							"Error checking user account email " + e.getMessage());
 				}
+				
+				if (exists) {
+					try {
+						user1 = userRep.userFromEmail(user.getEmail());
+					} catch (Exception e) {
+						throw new UncheckedPersistenceException(
+								"Error checking user account" + e.getMessage());
+					}
+				}
+				else {
+					return Response.status(401).build();
+				}
+			}
+			else {
+				if(user.getId() != null & user.getNickname()!=null){
+					boolean exists2 = false;
+					try {
+						exists2 = userRep.userExists(user.getId(), user.getNickname());
+					} catch (Exception e) {
+						throw new UncheckedPersistenceException(
+								"Error checking user account id and nickname " + e.getMessage());
+					}
+					
+					if (exists2) {
+						try {
+							user1 = userRep.userFromId(user.getId());
+						} catch (Exception e) {
+							throw new UncheckedPersistenceException(
+									"Error checking user account" + e.getMessage());
+						}
+					} else {
+						return Response.status(401).build();
+					}	
+				}
+				else{
+					return Response.status(400).build();
+				}
+			}
 
-				mapper.setConfig(mapper.getSerializationConfig().withView(
-						Views.UserGeneralView.class));
+			if (user1 != null) {
+				
+				mapper.setConfig(mapper.getSerializationConfig().withView(Views.UserGeneralView.class));
 				mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
 
 				String jsonOutput = null;
@@ -386,12 +418,14 @@ public class UserServicesImpl implements UserServices {
 				}
 				return Response.ok(cryptedjsonOutput,
 						MediaType.APPLICATION_JSON).build();
-			} else {
-				return Response.status(401).build();
+			} 
+			else {
+				return Response.status(500).build();
 			}
-		} else {
+		} 
+		
+		else {
 			return Response.status(400).build();
 		}
 	}
-
 }

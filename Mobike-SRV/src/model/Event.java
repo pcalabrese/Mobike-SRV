@@ -128,6 +128,10 @@ public class Event implements Serializable {
     @JoinColumn(name = "routes_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Route route;
+    
+    @JsonView(Views.EventGeneralView.class)
+    @Transient
+    private int userState;
 
     public Event() {
     }
@@ -293,7 +297,42 @@ public class Event implements Serializable {
         this.route = route;
     }
 
-    @Override
+    /**
+	 * @return the userState
+	 */
+	public int getUserState() {
+		return userState;
+	}
+
+	/**
+	 * @param userState the userState to set
+	 */
+	public void setUserState(int userState) {
+		this.userState = userState;
+	}
+	
+	public void setUserStateByUserId(long userId){
+		this.userState = 0;
+		for(User u: this.usersInvited){
+			if(u.getId()==userId){
+				this.userState = 1;
+				
+				for(User u1: this.usersAccepted){
+					if(u1.getId()==userId){
+						this.userState = 2;
+					}
+				}
+				
+				if(this.userState==1)
+					for(User u2: this.usersRefused){
+						if(u2.getId()==userId)
+							this.userState = 3;
+					}	
+			}
+		}	
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

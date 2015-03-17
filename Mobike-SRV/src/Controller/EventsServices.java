@@ -36,6 +36,8 @@ public interface EventsServices{
 	public String associateRoute(Long id);
 
 	public Response removeEvent(String cryptedJson);
+
+	public Response retrieveAllEventsWithState(String cryptedJson);
 	
 	
 	

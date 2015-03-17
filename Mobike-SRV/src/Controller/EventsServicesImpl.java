@@ -24,6 +24,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -180,6 +181,117 @@ public class EventsServicesImpl implements EventsServices {
 
 	@Override
 	@GET
+	@Path("/retrieveallws")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response retrieveAllEventsWithState(
+			@QueryParam("user") String cryptedJson) {
+
+		if (cryptedJson != null) {
+
+			Crypter crypter = new Crypter();
+
+			String plainUserJson = null;
+
+			try {
+				plainUserJson = crypter.decrypt(cryptedJson);
+			} catch (Exception e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			ObjectMapper mapper = new ObjectMapper();
+			User user = null;
+			try {
+				user = mapper.readValue(plainUserJson, User.class);
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+
+			if (user.getId() != null & user.getNickname() != null) {
+				UserRepository userRep = new UserMySQL();
+				boolean exists = false;
+				try {
+					exists = userRep.userExists(user.getId(),
+							user.getNickname());
+				} catch (PersistenceException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+
+				if (exists) {
+
+					List<Event> allEvents = null;
+					EventRepository eventRep = new EventMySQL();
+					try {
+						allEvents = eventRep.getAllEvents();
+					} catch (Exception e1) {
+						throw new UncheckedPersistenceException(
+								"Error retrieving allEvents from the DataBase"
+										+ e1.getMessage());
+					}
+
+					if (!(allEvents.isEmpty())) {
+						for(Event e: allEvents){
+							e.setUserStateByUserId(user.getId());
+						}
+						
+						mapper.setConfig(mapper.getSerializationConfig()
+								.withView(Views.EventGeneralView.class));
+						mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+								false);
+
+						String json = null;
+						try {
+							json = mapper.writeValueAsString(allEvents);
+						} catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						
+						String cryptedOutputJson = null;
+						try {
+							cryptedOutputJson = crypter.encrypt(json);
+						} catch (Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+						Map<String, String> map = new HashMap<String, String>();
+						map.put("event", cryptedOutputJson);
+						mapper = new ObjectMapper();
+						String jsonOutput = null;
+
+						try {
+							jsonOutput = mapper.writeValueAsString(map);
+						} catch (JsonProcessingException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						return Response.ok(jsonOutput,
+								MediaType.APPLICATION_JSON).build();
+
+					} else {
+						return Response.status(404).build();
+					}
+
+				} else {
+					return Response.status(401).build();
+				}
+
+			}
+			else {
+				return Response.status(400).build();
+			}
+		} else {
+			return Response.status(400).build();
+		}
+
+	}
+
+	@Override
+	@GET
 	@Path("/retrieve/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getEvent(@PathParam("id") Long id) {
@@ -316,32 +428,30 @@ public class EventsServicesImpl implements EventsServices {
 					// TODO Auto-generated catch block
 					e3.printStackTrace();
 				}
-				
-				if(event.getOwner().getId()==user.getId()){
+
+				if (event.getOwner().getId() == user.getId()) {
 					try {
 						eventRep.removeEvent(event);
 					} catch (PersistenceException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					return Response.ok().build();
-					
-				}
-				else{
+
+				} else {
 					return Response.status(401).build();
 				}
-				
+
 			} else {
 				return Response.status(400).build();
 
 			}
-			
+
 		} else {
 			return Response.status(400).build();
 		}
 
-		
 	}
 
 }

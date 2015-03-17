@@ -143,7 +143,7 @@ public class Route implements Serializable {
     @Transient
     private String gpxString;
     
-    @JsonView(Views.EventDetailView.class)
+    @JsonView({Views.EventDetailView.class, Views.ItineraryGeneralView.class})
     @Transient
     private String imgUrl;
     
