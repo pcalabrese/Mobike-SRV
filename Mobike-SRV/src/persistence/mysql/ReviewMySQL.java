@@ -37,12 +37,26 @@ public class ReviewMySQL implements ReviewRepository {
 
 	@Override
 	public void addReview(Review r) throws PersistenceException {
-		
+
 		em.getTransaction().begin();
 		em.persist(r);
 		em.getTransaction().commit();
-		
-		
+
+	}
+
+	@Override
+	public void editReview(Review r, String message, int rate)
+			throws PersistenceException {
+		Review review = em.find(Review.class, r.getId());
+		em.getTransaction().begin();
+		if (message != null) {
+			review.setMessage(message);
+		}
+		if (rate != -1){
+			review.setRate(rate);
+		}
+		em.getTransaction().commit();
+
 	}
 
 }
