@@ -24,6 +24,7 @@ import utils.Wrapper;
 public class ReviewServicesImpl implements ReviewServices {
 
 	protected ReviewRepository reviewRep;
+
 	public ReviewServicesImpl() {
 		reviewRep = new ReviewMySQL();
 	}
@@ -33,19 +34,19 @@ public class ReviewServicesImpl implements ReviewServices {
 	@Path("/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createReview(String wrappingJson) {
-			
-		Wrapper wrapper = new Wrapper();
-		
-		Map<String,String> map = wrapper.unwrap(wrappingJson);
-		
-		if(map != null){
 
-			if(map.get("review") != null & map.get("user") != null){
-				
+		Wrapper wrapper = new Wrapper();
+
+		Map<String, String> map = wrapper.unwrap(wrappingJson);
+
+		if (map != null) {
+
+			if (map.get("review") != null & map.get("user") != null) {
+
 				Authenticator auth = new Authenticator();
 				boolean exists = auth.validateCryptedUser(map.get("user"));
-				
-				if(exists){
+
+				if (exists) {
 					Crypter crypter = new Crypter();
 					String reviewPlainJson = null;
 					try {
@@ -54,63 +55,173 @@ public class ReviewServicesImpl implements ReviewServices {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					ObjectMapper mapper = new ObjectMapper();
 					Review review = null;
 					try {
-						review = mapper.readValue(reviewPlainJson, Review.class);
+						review = mapper
+								.readValue(reviewPlainJson, Review.class);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-					boolean authorized = auth.isAuthorized(review.getReviewPK().getUsersId(), map.get("user"));
-					
-					if(authorized){
+
+					boolean authorized = auth.isAuthorized(review.getReviewPK()
+							.getUsersId(), map.get("user"));
+
+					if (authorized) {
 						try {
 							reviewRep.addReview(review);
 						} catch (PersistenceException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
+
 						return Response.ok().build();
-					}
-					else{
+					} else {
 						return Response.status(401).build();
 					}
-					
-					
-				}
-				else{
+
+				} else {
 					return Response.status(401).build();
 				}
-			}
-			else {
+			} else {
 				return Response.status(400).build();
 			}
-		}
-		else {
+		} else {
 			return Response.status(400).build();
 		}
-		
-		
-		
-		}
-	
-		
 
-
-	@Override
-	public Response updateReview(String cryptedJson) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
-	public Response removeReview(String cryptedJson) {
-		// TODO Auto-generated method stub
-		return null;
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateReview(String wrappingJson) {
+
+		Wrapper wrapper = new Wrapper();
+
+		Map<String, String> map = wrapper.unwrap(wrappingJson);
+
+		if (map != null) {
+
+			if (map.get("review") != null & map.get("user") != null) {
+
+				Authenticator auth = new Authenticator();
+				boolean exists = auth.validateCryptedUser(map.get("user"));
+
+				if (exists) {
+					Crypter crypter = new Crypter();
+					String reviewPlainJson = null;
+					try {
+						reviewPlainJson = crypter.decrypt(map.get("review"));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					ObjectMapper mapper = new ObjectMapper();
+					Review review = null;
+					try {
+						review = mapper
+								.readValue(reviewPlainJson, Review.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					boolean authorized = auth.isAuthorized(review.getReviewPK()
+							.getUsersId(), map.get("user"));
+
+					if (authorized) {
+						try {
+							reviewRep.updateReview(review);
+							;
+						} catch (PersistenceException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						return Response.ok().build();
+					} else {
+						return Response.status(401).build();
+					}
+
+				} else {
+					return Response.status(401).build();
+				}
+			} else {
+				return Response.status(400).build();
+			}
+		} else {
+			return Response.status(400).build();
+		}
+	}
+
+	@Override
+	@POST
+	@Path("/delete")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response removeReview(String wrappingJson) {
+		Wrapper wrapper = new Wrapper();
+
+		Map<String, String> map = wrapper.unwrap(wrappingJson);
+
+		if (map != null) {
+
+			if (map.get("review") != null & map.get("user") != null) {
+
+				Authenticator auth = new Authenticator();
+				boolean exists = auth.validateCryptedUser(map.get("user"));
+
+				if (exists) {
+					Crypter crypter = new Crypter();
+					String reviewPlainJson = null;
+					try {
+						reviewPlainJson = crypter.decrypt(map.get("review"));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					ObjectMapper mapper = new ObjectMapper();
+					Review review = null;
+					try {
+						review = mapper
+								.readValue(reviewPlainJson, Review.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					boolean authorized = auth.isAuthorized(review.getReviewPK()
+							.getUsersId(), map.get("user"));
+
+					if (authorized) {
+						try {
+							reviewRep.removeReviewFromId(review.getReviewPK());
+							;
+							;
+						} catch (PersistenceException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						return Response.ok().build();
+					} else {
+						return Response.status(401).build();
+					}
+
+				} else {
+					return Response.status(401).build();
+				}
+			} else {
+				return Response.status(400).build();
+			}
+		} else {
+			return Response.status(400).build();
+		}
 	}
 
 }

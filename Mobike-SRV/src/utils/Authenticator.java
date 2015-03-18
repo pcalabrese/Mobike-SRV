@@ -123,7 +123,7 @@ public class Authenticator {
 	
 	
 	public boolean isAuthorized(long id, String cryptedJson){
-		boolean exists = validatePlainUser(cryptedJson);
+		boolean exists = validateCryptedUser(cryptedJson);
 		
 		if(exists){
 			Crypter crypter = new Crypter();

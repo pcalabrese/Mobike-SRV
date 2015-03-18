@@ -12,5 +12,7 @@ public interface ReviewRepository {
 	
 	public void addReview(Review r) throws PersistenceException;
 
+	void updateReview(Review r) throws PersistenceException;
+
 	
 }
