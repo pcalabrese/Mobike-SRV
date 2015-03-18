@@ -1,11 +1,13 @@
 package Controller;
 
+import javax.ws.rs.core.Response;
+
 public interface ReviewServices {
 
-	public void createReview(String cryptedJson);
+	public Response createReview(String cryptedJson);
 	
-	public void updateReview(String cryptedJson);
+	public Response updateReview(String cryptedJson);
 	
-	public void removeReview(String cryptedJson);
+	public Response removeReview(String cryptedJson);
 
 }

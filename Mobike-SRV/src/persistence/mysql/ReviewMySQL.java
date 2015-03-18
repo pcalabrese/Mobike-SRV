@@ -41,8 +41,19 @@ public class ReviewMySQL implements ReviewRepository {
 		em.getTransaction().begin();
 		em.persist(r);
 		em.getTransaction().commit();
+	}
+	
+	public void updateReview(Review r) throws PersistenceException {
 		
+		Review review = em.find(Review.class, r.getReviewPK());
 		
+		em.getTransaction().begin();
+		
+		review.setMessage(r.getMessage());
+		review.setRate(r.getRate());
+		
+		em.getTransaction().commit();
+	
 	}
 
 }
