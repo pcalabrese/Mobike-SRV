@@ -1,5 +1,4 @@
 package persistence.mysql;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import model.Review;

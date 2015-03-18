@@ -1,6 +1,7 @@
 package persistence;
 
 import java.util.List;
+
 import model.Route;
 import persistence.exception.PersistenceException;
 
@@ -51,4 +52,8 @@ public interface RouteRepository {
 	 * @throws PersistenceException
 	 */
 	public void removeRouteFromId(long id) throws PersistenceException;
+	
+	public List<Route> searchRouteByCriteria(String startLocation, String endLocation, int minLength, int maxLength, int minDuration, int maxDuration, String type);
+
+	
 }

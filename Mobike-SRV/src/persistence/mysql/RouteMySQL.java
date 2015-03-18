@@ -1,9 +1,13 @@
 package persistence.mysql;
 
 import java.util.List;
+
 import model.Route;
 import persistence.RouteRepository;
+
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
+
 import persistence.jpa.SingletonEMF;
 
 
@@ -55,7 +59,7 @@ public class RouteMySQL implements RouteRepository{
 
 	/* metodo aggiornato
 	 * restituisce la lista di Route corrispondenti a quel nome, 
-	 * dato che la colonna Name non è Unique.*/
+	 * dato che la colonna Name non ï¿½ Unique.*/
 	
 	@Override
 	public List<Route> routeFromName(String name) {
@@ -136,6 +140,25 @@ public class RouteMySQL implements RouteRepository{
 		}
 		
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Route> searchRouteByCriteria(String startLocation, String endLocation, int minLength, int maxLength, int minDuration, int maxDuration, String type){
+		List<Route> routes = null;
+		String stringSQL;
+		stringSQL = "SELECT * FROM ROUTES WHERE 1";
+		stringSQL += startLocation != null ?  " AND startlocation=\"" + startLocation + "\"" : "";
+		stringSQL += endLocation != null ? " AND endlocation=\"" + endLocation + "\"" : "";
+		stringSQL += minLength > 0.0 ? " AND length>" + minLength : "";
+		stringSQL += maxLength > 0.0 ? " AND length<" + maxLength : "";
+		stringSQL += minDuration > 0 ?  " AND duration>" + minDuration : "";
+		stringSQL += maxDuration > 0 ? " AND duration<" + maxDuration : "";
+		stringSQL += type!=null ? " AND type=\"" + type + "\"": "";
+		
+		Query query = em.createNativeQuery(stringSQL,Route.class);
+		routes = query.getResultList();	
+		return routes;
 	}
 	
 }
