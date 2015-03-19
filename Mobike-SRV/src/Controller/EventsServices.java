@@ -38,6 +38,8 @@ public interface EventsServices{
 	public Response removeEvent(String cryptedJson);
 
 	public Response retrieveAllEventsWithState(String cryptedJson);
+
+	public Response updateEvent(String wrappingJson);
 	
 	
 	

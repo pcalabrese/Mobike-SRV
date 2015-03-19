@@ -13,7 +13,9 @@ import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.EventMySQL;
 import persistence.mysql.UserMySQL;
+import utils.Authenticator;
 import utils.Crypter;
+import utils.Wrapper;
 import model.Event;
 import model.User;
 import model.Views;
@@ -452,6 +454,70 @@ public class EventsServicesImpl implements EventsServices {
 			return Response.status(400).build();
 		}
 
+	}
+	
+	@Override
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response updateEvent(String wrappingJson) {
+
+		Wrapper wrapper = new Wrapper();
+
+		Map<String, String> map = wrapper.unwrap(wrappingJson);
+
+		if (map != null) {
+
+			if (map.get("event") != null & map.get("user") != null) {
+
+				Authenticator auth = new Authenticator();
+				boolean exists = auth.validateCryptedUser(map.get("user"));
+
+				if (exists) {
+					Crypter crypter = new Crypter();
+					String eventPlainJson = null;
+					try {
+						eventPlainJson = crypter.decrypt(map.get("event"));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					ObjectMapper mapper = new ObjectMapper();
+					Event event = null;
+					try {
+						event = mapper
+								.readValue(eventPlainJson, Event.class);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+					boolean authorized = auth.isAuthorized(event.getOwner().getId(), map.get("user"));
+
+					if (authorized) {
+						try {
+							eventRep.updateEvent(event);
+							;
+						} catch (PersistenceException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+
+						return Response.ok().build();
+					} else {
+						return Response.status(401).build();
+					}
+
+				} else {
+					return Response.status(401).build();
+				}
+			} else {
+				return Response.status(400).build();
+			}
+		} else {
+			return Response.status(400).build();
+		}
 	}
 
 }
