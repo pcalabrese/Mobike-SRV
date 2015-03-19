@@ -6,7 +6,6 @@ import model.Route;
 import persistence.RouteRepository;
 
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 
 import persistence.jpa.SingletonEMF;
 

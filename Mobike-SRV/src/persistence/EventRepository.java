@@ -45,4 +45,6 @@ public interface EventRepository {
 	 * @throws PersistenceException
 	 */
 	public void removeEventFromId(long id) throws PersistenceException;
+
+	public void updateEvent(Event e) throws PersistenceException;
 }

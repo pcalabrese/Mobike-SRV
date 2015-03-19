@@ -2,9 +2,13 @@ package persistence.mysql;
 
 
 import java.util.List;
+
 import model.Event;
 import persistence.EventRepository;
+
 import javax.persistence.*;
+
+import persistence.exception.PersistenceException;
 import persistence.jpa.SingletonEMF;
 
 
@@ -124,6 +128,27 @@ public class EventMySQL implements EventRepository{
 		}
 		
 		
+	}
+	
+	
+	@Override
+	public void updateEvent(Event e) throws PersistenceException {
+		
+		Event event = em.find(Event.class, e.getId());
+		
+		em.getTransaction().begin();
+		
+		event.setName(e.getName());
+		event.setDescription(e.getDescription());
+		event.setStartdate(e.getStartdate());
+		event.setStartlocation(e.getStartlocation());
+		event.setCreationdate(e.getCreationdate());
+		event.setUsersInvited(e.getUsersInvited());
+		event.setUsersAccepted(e.getUsersAccepted());
+		event.setUserRefused(e.getUserRefused());
+		
+		em.getTransaction().commit();
+	
 	}
 	
 }
