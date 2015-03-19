@@ -11,15 +11,8 @@ import persistence.fs.*;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
-import utils.exception.CryptingException;
-import utils.exception.UncheckedAuthenticationException;
-import utils.exception.UncheckedCryptingException;
-import utils.exception.UncheckedWrappingException;
-import utils.exception.WrappingException;
-import utils.exception.AuthenticationException;
 import model.Route;
 import model.Views;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -77,98 +70,74 @@ public class RouteServicesImpl implements RouteServices {
 	public Response createRoute(String wrappingJson) {
 
 		Wrapper wrapper = new Wrapper();
-		Map<String, String> map;
+		Map<String, String> map = null;
 
 		try {
 			map = wrapper.unwrap(wrappingJson);
-		} catch (WrappingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw new UncheckedWrappingException();
 		}
 
 		if (map != null) {
 
-			if (map.get("route") != null & map.get("user") != null) {
+			if (map.containsKey("route") & map.containsKey("user")) {
 
 				Authenticator auth = new Authenticator();
-				boolean exists = false;
+				Crypter crypter = new Crypter();
+				ObjectMapper mapper = new ObjectMapper();
+				boolean authorized = false;
+
+				Route route = null;
 
 				try {
-					exists = auth.validateCryptedUser(map.get("user"));
-				} catch (AuthenticationException e) {
-					e.printStackTrace();
-					throw new UncheckedAuthenticationException();
+					route = mapper.readValue(crypter.decrypt(map.get("route")),
+							Route.class);
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 
-				if (exists) {
-					Crypter crypter = new Crypter();
-					String routePlainJson = null;
+				try {
+					authorized = auth.isAuthorized(route.getOwner().getId(),
+							map.get("user"));
+				} catch (Exception e) {
+					e.printStackTrace();
+
+				}
+
+				if (authorized) {
+
+					String gpxString = route.getGpxString();
+					String url = null;
+					long insertedId = -1;
 
 					try {
-						routePlainJson = crypter.decrypt(map.get("route"));
-					} catch (CryptingException e) {
-						e.printStackTrace();
-						throw new UncheckedCryptingException();
+						RouteIO writer = new GpxIO();
+						url = writer.write(gpxString, route.getName());
 					}
 
-					ObjectMapper mapper = new ObjectMapper();
-
-					Route route = null;
-
-					try {
-						route = mapper.readValue(routePlainJson, Route.class);
-					} catch (Exception e) {
-						throw new UncheckedPersistenceException(
-								"Error accessing routes database", e);
+					catch (Exception e) {
+						throw new UncheckedFilesystemException(
+								"Error saving file to filesystem"
+										+ e.getMessage(), e);
 					}
 
-					boolean authorized = false;
-
-					try {
-						authorized = auth.isAuthorized(route.getOwner().getId(), map.get("user"));
-					} catch (AuthenticationException e) {
-						e.printStackTrace();
-						throw new UncheckedAuthenticationException();
-					}
-
-					if (authorized) {
-						String gpxString = route.getGpxString();
-						String url = null;
-						long insertedId = -1;
-
+					if (url != null) {
+						route.setUrl(url);
 						try {
-							RouteIO writer = new GpxIO();
-							url = writer.write(gpxString, route.getName());
-						}
+							insertedId = routeRep.addRoute(route);
 
-						catch (Exception e) {
-							throw new UncheckedFilesystemException(
-									"Error saving file to filesystem"
+						} catch (Exception e) {
+							throw new UncheckedPersistenceException(
+									"Error adding route to database"
 											+ e.getMessage(), e);
 						}
-
-						if (url != null) {
-							route.setUrl(url);
-							try {
-								insertedId = routeRep.addRoute(route);
-
-							} catch (Exception e) {
-								throw new UncheckedPersistenceException(
-										"Error adding route to database"
-												+ e.getMessage(), e);
-							}
-						} else {
-							throw new UncheckedFilesystemException(
-									"GPX Url not reachable");
-						}
-
-						String outputId = "" + insertedId + "";
-						return Response.ok(outputId, MediaType.TEXT_PLAIN)
-								.build();
-
 					} else {
-						return Response.status(401).build();
+						throw new UncheckedFilesystemException(
+								"GPX Url not reachable");
 					}
+
+					String outputId = "" + insertedId + "";
+					return Response.ok(outputId, MediaType.TEXT_PLAIN).build();
 
 				} else {
 					return Response.status(401).build();
@@ -215,7 +184,8 @@ public class RouteServicesImpl implements RouteServices {
 		try {
 			route = routeREP.routeFromId(id);
 		} catch (Exception e) {
-			throw new UncheckedPersistenceException("Error accessing routes database");
+			throw new UncheckedPersistenceException(
+					"Error accessing routes database");
 		}
 
 		// check route!=null -> id exists in the DB
@@ -244,16 +214,16 @@ public class RouteServicesImpl implements RouteServices {
 						route);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
-				throw new UncheckedControllerException("Error serializing JSON");
+				
 			}
 
 			Crypter crypter = new Crypter();
 			String cryptedJson = null;
 			try {
 				cryptedJson = crypter.encrypt(json);
-			} catch (CryptingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedCryptingException();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("route", cryptedJson);
@@ -262,9 +232,9 @@ public class RouteServicesImpl implements RouteServices {
 			String outputJson = null;
 			try {
 				outputJson = wrapper.wrap(map);
-			} catch (WrappingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedWrappingException();
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
@@ -318,16 +288,16 @@ public class RouteServicesImpl implements RouteServices {
 						allRoutes);
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
-				throw new UncheckedControllerException("error writing Json");
+				
 			}
 
 			Crypter crypter = new Crypter();
 			String cryptedJson = null;
 			try {
 				cryptedJson = crypter.encrypt(json);
-			} catch (CryptingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedCryptingException();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("routes", cryptedJson);
@@ -336,9 +306,9 @@ public class RouteServicesImpl implements RouteServices {
 
 			try {
 				outputJson = wrapper.wrap(map);
-			} catch (WrappingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedWrappingException();
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
@@ -396,9 +366,9 @@ public class RouteServicesImpl implements RouteServices {
 			String cryptedJson = null;
 			try {
 				cryptedJson = crypter.encrypt(json);
-			} catch (CryptingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedCryptingException();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("routes", cryptedJson);
@@ -407,9 +377,9 @@ public class RouteServicesImpl implements RouteServices {
 
 			try {
 				outputJson = wrapper.wrap(map);
-			} catch (WrappingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new UncheckedWrappingException("Error writing JSON");
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
