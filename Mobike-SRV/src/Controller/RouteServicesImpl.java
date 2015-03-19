@@ -3,7 +3,6 @@ package Controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import persistence.RouteRepository;
 import persistence.exception.*;
 import persistence.mysql.RouteMySQL;
@@ -22,9 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import Controller.exception.UncheckedControllerException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
