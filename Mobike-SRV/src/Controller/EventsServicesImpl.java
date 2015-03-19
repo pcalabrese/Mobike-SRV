@@ -16,6 +16,10 @@ import persistence.mysql.UserMySQL;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
+import utils.exception.AuthenticationException;
+import utils.exception.UncheckedAuthenticationException;
+import utils.exception.UncheckedWrappingException;
+import utils.exception.WrappingException;
 import model.Event;
 import model.User;
 import model.Views;
@@ -464,14 +468,26 @@ public class EventsServicesImpl implements EventsServices {
 
 		Wrapper wrapper = new Wrapper();
 
-		Map<String, String> map = wrapper.unwrap(wrappingJson);
+		Map<String, String> map;
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (WrappingException e1) {
+			e1.printStackTrace();
+			throw new UncheckedWrappingException();
+		}
 
 		if (map != null) {
 
 			if (map.get("event") != null & map.get("user") != null) {
 
 				Authenticator auth = new Authenticator();
-				boolean exists = auth.validateCryptedUser(map.get("user"));
+				boolean exists = false;
+				try {
+					exists = auth.validateCryptedUser(map.get("user"));
+				} catch (AuthenticationException e1) {
+					e1.printStackTrace();
+					throw new UncheckedAuthenticationException();
+				}
 
 				if (exists) {
 					Crypter crypter = new Crypter();
@@ -493,15 +509,21 @@ public class EventsServicesImpl implements EventsServices {
 						e.printStackTrace();
 					}
 
-					boolean authorized = auth.isAuthorized(event.getOwner().getId(), map.get("user"));
+					boolean authorized =false;
+					try {
+						authorized = auth.isAuthorized(event.getOwner().getId(), map.get("user"));
+					} catch (AuthenticationException e1) {
+						e1.printStackTrace();
+						throw new UncheckedAuthenticationException();
+					}
 
 					if (authorized) {
 						try {
 							eventRep.updateEvent(event);
 							;
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							throw new UncheckedPersistenceException("Error updating event");
 						}
 
 						return Response.ok().build();
