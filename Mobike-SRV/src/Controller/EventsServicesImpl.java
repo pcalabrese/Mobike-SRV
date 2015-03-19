@@ -17,10 +17,13 @@ import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
 import utils.exception.AuthenticationException;
+import utils.exception.CryptingException;
 import utils.exception.UncheckedAuthenticationException;
+import utils.exception.UncheckedCryptingException;
 import utils.exception.UncheckedWrappingException;
 import utils.exception.WrappingException;
 import model.Event;
+import model.Review;
 import model.User;
 import model.Views;
 
@@ -33,6 +36,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import Controller.exception.UncheckedControllerException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -61,63 +66,75 @@ public class EventsServicesImpl implements EventsServices {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createEvent(String wrappingJson) {
 
-		if (wrappingJson != null) {
-			ObjectMapper mapper = new ObjectMapper();
-			Map<String, String> map = null;
+		Wrapper wrapper = new Wrapper();
+		Map<String, String> map = null;
+		
+		try {
+			
+			map = wrapper.unwrap(wrappingJson);
+		} catch (WrappingException e){
+			e.printStackTrace();
+			throw new UncheckedWrappingException();
+		}
 
-			try {
-				map = mapper.readValue(wrappingJson, Map.class);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		if (map != null) {
 
-			if (map.containsKey("event")) {
-				Crypter crypter = new Crypter();
-				String json = null;
+			if (map.get("event") != null & map.get("user") != null) {
 
-				try {
-					json = crypter.decrypt(map.get("event"));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				Event event = null;
-				try {
-					event = mapper.readValue(json, Event.class);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
+				Authenticator auth = new Authenticator();
 				boolean exists = false;
-				UserRepository userRep = new UserMySQL();
-
 				try {
-					exists = userRep.userExists(event.getOwner().getId(), event
-							.getOwner().getNickname());
-				} catch (PersistenceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					exists = auth.validateCryptedUser(map.get("user"));
+				} catch (AuthenticationException e1) {
+					e1.printStackTrace();
+					throw new UncheckedAuthenticationException();
 				}
 
 				if (exists) {
-					long insertedId = -1;
-
+					Crypter crypter = new Crypter();
+					String eventPlainJson = null;
 					try {
-						insertedId = eventRep.addEvent(event);
+						eventPlainJson = crypter.decrypt(map.get("event"));
 					} catch (Exception e) {
-						throw new UncheckedPersistenceException(
-								"Error adding event to the DataBase"
-										+ e.getMessage());
+						e.printStackTrace();
+						throw new UncheckedCryptingException();
 					}
-					String outputId = "" + insertedId + "";
-					return Response.ok(outputId, MediaType.TEXT_PLAIN).build();
+
+					ObjectMapper mapper = new ObjectMapper();
+					Event event = null;
+					try {
+						event = mapper
+								.readValue(eventPlainJson, Event.class);
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new UncheckedControllerException("Error Reading Json");
+						
+					}
+
+					boolean authorized;
+					try {
+						authorized = auth.isAuthorized(event.getOwner().getId(), map.get("user"));
+					} catch (AuthenticationException e1) {
+						e1.printStackTrace();
+						throw new UncheckedAuthenticationException();
+					}
+
+					if (authorized) {
+						try {
+							eventRep.addEvent(event);
+						} catch (PersistenceException e) {
+							e.printStackTrace();
+							throw new UncheckedPersistenceException("Error adding Event to the Database");
+						}
+
+						return Response.ok().build();
+					} else {
+						return Response.status(401).build();
+					}
+
 				} else {
 					return Response.status(401).build();
 				}
-
 			} else {
 				return Response.status(400).build();
 			}
@@ -327,8 +344,8 @@ public class EventsServicesImpl implements EventsServices {
 				json = objectMapper.writerWithView(Views.EventDetailView.class)
 						.writeValueAsString(event);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new UncheckedControllerException();
 			}
 
 			// inizialize Crypter and JSON encrypted string
@@ -338,22 +355,22 @@ public class EventsServicesImpl implements EventsServices {
 			// start encrypting JSON
 			try {
 				cryptedJson = crypter.encrypt(json);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (CryptingException e) {
 				e.printStackTrace();
+				throw new UncheckedCryptingException();
 			}
 
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("event", cryptedJson);
 
-			objectMapper = new ObjectMapper();
+			Wrapper wrapper = new Wrapper();
 			String outputJson = null;
 
 			try {
-				outputJson = objectMapper.writeValueAsString(map);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				outputJson = wrapper.wrap(map);
+			} catch (WrappingException e) {
 				e.printStackTrace();
+				throw new UncheckedWrappingException();
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();

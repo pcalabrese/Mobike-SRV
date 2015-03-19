@@ -25,7 +25,6 @@ public class Wrapper {
 			try {
 				output = this.mapper.writeValueAsString(map);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				throw new WrappingException(e.getMessage());
 			}
 
@@ -42,7 +41,6 @@ public class Wrapper {
 				map = (Map<String, String>) mapper.readValue(wrappingJson,
 						Map.class);
 			} catch (IOException e) {
-				//TODO Auto-generated catch block
 				throw new WrappingException(e.getMessage());
 			}
 		}
