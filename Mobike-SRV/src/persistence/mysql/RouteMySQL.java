@@ -1,13 +1,9 @@
 package persistence.mysql;
 
 import java.util.List;
-
 import model.Route;
 import persistence.RouteRepository;
-
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-
 import persistence.jpa.SingletonEMF;
 
 
@@ -86,7 +82,7 @@ public class RouteMySQL implements RouteRepository{
 			
 			}
 		catch(IllegalArgumentException e){
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 			}
 		finally{
 			
@@ -108,7 +104,7 @@ public class RouteMySQL implements RouteRepository{
 				em.remove(p);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e){
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 		}
 		
 		finally{
@@ -132,7 +128,7 @@ public class RouteMySQL implements RouteRepository{
 				em.remove(p);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e){
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 		}
 		
 		finally{

@@ -6,7 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import persistence.UserRepository;
 import persistence.exception.PersistenceException;
+import persistence.exception.UncheckedPersistenceException;
 import persistence.mysql.UserMySQL;
+import utils.exception.AuthenticationException;
+import utils.exception.UncheckedAuthenticationException;
+import utils.exception.UncheckedCryptingException;
 import model.User;
 
 public class Authenticator {
@@ -15,7 +19,7 @@ public class Authenticator {
 		// TODO Auto-generated constructor stub
 	}
 
-	public boolean validateCryptedUser(String cryptedJson) {
+	public boolean validateCryptedUser(String cryptedJson) throws AuthenticationException {
 		if (cryptedJson != null) {
 			Crypter crypter = new Crypter();
 
@@ -24,8 +28,7 @@ public class Authenticator {
 			try {
 				plainJson = crypter.decrypt(cryptedJson);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new AuthenticationException(e.getMessage());
 			}
 
 			if (plainJson != null) {
@@ -35,8 +38,7 @@ public class Authenticator {
 				try {
 					user = mapper.readValue(plainJson, User.class);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new AuthenticationException(e.getMessage());
 				}
 				boolean exists = false;
 				if (user.getEmail() != null) {
@@ -44,8 +46,7 @@ public class Authenticator {
 					try {
 						exists = userRep.userExists(user.getEmail());
 					} catch (PersistenceException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new UncheckedPersistenceException(e.getMessage());
 					}
 					return exists;
 				}
@@ -56,8 +57,7 @@ public class Authenticator {
 							exists = userRep.userExists(user.getId(),
 									user.getNickname());
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							throw new UncheckedPersistenceException(e.getMessage());
 						}
 					}
 					return exists;
@@ -72,7 +72,7 @@ public class Authenticator {
 	}
 	
 	
-	public boolean validatePlainUser(String plainJson) {
+	public boolean validatePlainUser(String plainJson) throws AuthenticationException {
 		
 			if (plainJson != null) {
 				User user = null;
@@ -81,8 +81,7 @@ public class Authenticator {
 				try {
 					user = mapper.readValue(plainJson, User.class);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new AuthenticationException(e.getMessage());
 				}
 				boolean exists = false;
 				if (user.getEmail() != null) {
@@ -90,8 +89,7 @@ public class Authenticator {
 					try {
 						exists = userRep.userExists(user.getEmail());
 					} catch (PersistenceException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						throw new UncheckedPersistenceException(e.getMessage());
 					}
 					return exists;
 				}
@@ -102,8 +100,7 @@ public class Authenticator {
 							exists = userRep.userExists(user.getId(),
 									user.getNickname());
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							throw new UncheckedPersistenceException(e.getMessage());
 						}
 					}
 					return exists;
@@ -122,8 +119,13 @@ public class Authenticator {
 	
 	
 	
-	public boolean isAuthorized(long id, String cryptedJson){
-		boolean exists = validateCryptedUser(cryptedJson);
+	public boolean isAuthorized(long id, String cryptedJson) throws AuthenticationException{
+		boolean exists = false;
+		try {
+			exists = validateCryptedUser(cryptedJson);
+		} catch (AuthenticationException e1) {
+			throw new UncheckedAuthenticationException(e1.getMessage());
+		}
 		
 		if(exists){
 			Crypter crypter = new Crypter();
@@ -132,8 +134,7 @@ public class Authenticator {
 			try {
 				plainJson = crypter.decrypt(cryptedJson);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new UncheckedCryptingException(e.getMessage(), e);
 			}
 			
 			ObjectMapper mapper = new ObjectMapper();
@@ -142,8 +143,7 @@ public class Authenticator {
 			try {
 				user = mapper.readValue(plainJson, User.class);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new AuthenticationException(e.getMessage());
 			}
 			
 			if(user != null){

@@ -2,9 +2,12 @@ package persistence.mysql;
 
 
 import java.util.List;
+
 import model.Event;
 import persistence.EventRepository;
+
 import javax.persistence.*;
+
 import persistence.jpa.SingletonEMF;
 
 
@@ -69,7 +72,7 @@ public class EventMySQL implements EventRepository{
 			
 			}
 		catch(IllegalArgumentException e1){
-			e1.getStackTrace();
+			throw new PersistenceException(e1.getMessage());
 			}
 		finally{
 			
@@ -92,7 +95,7 @@ public class EventMySQL implements EventRepository{
 				em.remove(e);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e1){
-			e1.getStackTrace();
+			throw new PersistenceException(e1.getMessage());
 		}
 		
 		finally{
@@ -116,7 +119,7 @@ public class EventMySQL implements EventRepository{
 				em.remove(e);
 			em.getTransaction().commit();
 		}catch(IllegalArgumentException e1){
-			e1.getStackTrace();
+			throw new PersistenceException(e1.getMessage());
 		}
 		
 		finally{

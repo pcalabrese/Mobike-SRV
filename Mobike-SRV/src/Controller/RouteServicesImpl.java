@@ -173,7 +173,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 			route = routeREP.routeFromId(id);
 			}
 			catch(Exception e){
-				throw new UncheckedPersistenceException("Error accessing routes database");
+				throw new UncheckedPersistenceException("Error accessing routes database", e);
 			}
 			
 			// check route!=null -> id exists in the DB

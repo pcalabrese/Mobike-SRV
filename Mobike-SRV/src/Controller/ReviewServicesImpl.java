@@ -10,15 +10,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import model.Review;
+import Controller.exception.UncheckedControllerException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import persistence.ReviewRepository;
 import persistence.exception.PersistenceException;
+import persistence.exception.UncheckedPersistenceException;
 import persistence.mysql.ReviewMySQL;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
+import utils.exception.AuthenticationException;
+import utils.exception.UncheckedAuthenticationException;
+import utils.exception.UncheckedCryptingException;
+import utils.exception.UncheckedWrappingException;
+import utils.exception.WrappingException;
 
 @Path("/reviews")
 public class ReviewServicesImpl implements ReviewServices {
@@ -37,14 +44,26 @@ public class ReviewServicesImpl implements ReviewServices {
 
 		Wrapper wrapper = new Wrapper();
 
-		Map<String, String> map = wrapper.unwrap(wrappingJson);
+		Map<String, String> map;
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (WrappingException e1) {
+			e1.printStackTrace();
+			throw new UncheckedWrappingException();
+		}
 
 		if (map != null) {
 
 			if (map.get("review") != null & map.get("user") != null) {
 
 				Authenticator auth = new Authenticator();
-				boolean exists = auth.validateCryptedUser(map.get("user"));
+				boolean exists = false;
+				try {
+					exists = auth.validateCryptedUser(map.get("user"));
+				} catch (AuthenticationException e1) {
+					e1.printStackTrace();
+					throw new UncheckedAuthenticationException();
+				}
 
 				if (exists) {
 					Crypter crypter = new Crypter();
@@ -52,8 +71,8 @@ public class ReviewServicesImpl implements ReviewServices {
 					try {
 						reviewPlainJson = crypter.decrypt(map.get("review"));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedCryptingException();
 					}
 
 					ObjectMapper mapper = new ObjectMapper();
@@ -62,19 +81,26 @@ public class ReviewServicesImpl implements ReviewServices {
 						review = mapper
 								.readValue(reviewPlainJson, Review.class);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedControllerException("Error Reading Json");
+						
 					}
 
-					boolean authorized = auth.isAuthorized(review.getReviewPK()
-							.getUsersId(), map.get("user"));
+					boolean authorized;
+					try {
+						authorized = auth.isAuthorized(review.getReviewPK()
+								.getUsersId(), map.get("user"));
+					} catch (AuthenticationException e1) {
+						e1.printStackTrace();
+						throw new UncheckedAuthenticationException();
+					}
 
 					if (authorized) {
 						try {
 							reviewRep.addReview(review);
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							throw new UncheckedPersistenceException("Error adding Review to the Database");
 						}
 
 						return Response.ok().build();
@@ -102,14 +128,26 @@ public class ReviewServicesImpl implements ReviewServices {
 
 		Wrapper wrapper = new Wrapper();
 
-		Map<String, String> map = wrapper.unwrap(wrappingJson);
+		Map<String, String> map;
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (WrappingException e1) {
+			e1.printStackTrace();
+			throw new UncheckedWrappingException();
+		}
 
 		if (map != null) {
 
 			if (map.get("review") != null & map.get("user") != null) {
 
 				Authenticator auth = new Authenticator();
-				boolean exists = auth.validateCryptedUser(map.get("user"));
+				boolean exists;
+				try {
+					exists = auth.validateCryptedUser(map.get("user"));
+				} catch (AuthenticationException e1) {
+					e1.printStackTrace();
+					throw new UncheckedAuthenticationException();
+				}
 
 				if (exists) {
 					Crypter crypter = new Crypter();
@@ -117,8 +155,8 @@ public class ReviewServicesImpl implements ReviewServices {
 					try {
 						reviewPlainJson = crypter.decrypt(map.get("review"));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedCryptingException();
 					}
 
 					ObjectMapper mapper = new ObjectMapper();
@@ -127,20 +165,26 @@ public class ReviewServicesImpl implements ReviewServices {
 						review = mapper
 								.readValue(reviewPlainJson, Review.class);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedControllerException("Error reading Json");
 					}
 
-					boolean authorized = auth.isAuthorized(review.getReviewPK()
-							.getUsersId(), map.get("user"));
+					boolean authorized = false;
+					try {
+						authorized = auth.isAuthorized(review.getReviewPK()
+								.getUsersId(), map.get("user"));
+					} catch (AuthenticationException e1) {
+						e1.printStackTrace();
+						throw new UncheckedAuthenticationException();
+					}
 
 					if (authorized) {
 						try {
 							reviewRep.updateReview(review);
 							;
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							throw new UncheckedPersistenceException("Error updating Review");
 						}
 
 						return Response.ok().build();
@@ -166,14 +210,26 @@ public class ReviewServicesImpl implements ReviewServices {
 	public Response removeReview(String wrappingJson) {
 		Wrapper wrapper = new Wrapper();
 
-		Map<String, String> map = wrapper.unwrap(wrappingJson);
+		Map<String, String> map;
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (WrappingException e1) {
+			e1.printStackTrace();
+			throw new UncheckedWrappingException();
+		}
 
 		if (map != null) {
 
 			if (map.get("review") != null & map.get("user") != null) {
 
 				Authenticator auth = new Authenticator();
-				boolean exists = auth.validateCryptedUser(map.get("user"));
+				boolean exists;
+				try {
+					exists = auth.validateCryptedUser(map.get("user"));
+				} catch (AuthenticationException e1) {
+					e1.printStackTrace();
+					throw new UncheckedAuthenticationException();
+				}
 
 				if (exists) {
 					Crypter crypter = new Crypter();
@@ -181,8 +237,8 @@ public class ReviewServicesImpl implements ReviewServices {
 					try {
 						reviewPlainJson = crypter.decrypt(map.get("review"));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedCryptingException();
 					}
 
 					ObjectMapper mapper = new ObjectMapper();
@@ -191,21 +247,26 @@ public class ReviewServicesImpl implements ReviewServices {
 						review = mapper
 								.readValue(reviewPlainJson, Review.class);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw new UncheckedControllerException();
 					}
 
-					boolean authorized = auth.isAuthorized(review.getReviewPK()
-							.getUsersId(), map.get("user"));
+					boolean authorized;
+					try {
+						authorized = auth.isAuthorized(review.getReviewPK()
+								.getUsersId(), map.get("user"));
+					} catch (AuthenticationException e1) {
+						e1.printStackTrace();
+						throw new UncheckedAuthenticationException();
+					}
 
 					if (authorized) {
 						try {
 							reviewRep.removeReviewFromId(review.getReviewPK());
-							;
-							;
+							
 						} catch (PersistenceException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
+							throw new UncheckedPersistenceException("Error Removing Review from DB");
 						}
 
 						return Response.ok().build();

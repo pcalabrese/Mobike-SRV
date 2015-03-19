@@ -62,7 +62,7 @@ public class UserMySQL implements UserRepository {
 			insertedId = u.getId();
 
 		} catch (IllegalArgumentException e) {
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 		} finally {
 
 			em.close();
@@ -80,7 +80,7 @@ public class UserMySQL implements UserRepository {
 				em.remove(u);
 			em.getTransaction().commit();
 		} catch (IllegalArgumentException e) {
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 		}
 
 		finally {
@@ -97,7 +97,7 @@ public class UserMySQL implements UserRepository {
 				em.remove(u);
 			em.getTransaction().commit();
 		} catch (IllegalArgumentException e) {
-			e.getStackTrace();
+			throw new PersistenceException(e.getMessage());
 		}
 
 		finally {

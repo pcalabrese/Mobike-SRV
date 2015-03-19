@@ -3,6 +3,8 @@ package utils;
 import java.io.IOException;
 import java.util.Map;
 
+import utils.exception.WrappingException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -15,7 +17,7 @@ public class Wrapper {
 
 	}
 
-	public String wrap(Map<String, String> map) {
+	public String wrap(Map<String, String> map) throws WrappingException {
 
 		if (map != null) {
 			String output = null;
@@ -24,7 +26,7 @@ public class Wrapper {
 				output = this.mapper.writeValueAsString(map);
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new WrappingException(e.getMessage());
 			}
 
 			return output;
@@ -33,7 +35,7 @@ public class Wrapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, String> unwrap(String wrappingJson) {
+	public Map<String, String> unwrap(String wrappingJson) throws WrappingException {
 		Map<String, String> map = null;
 		if(wrappingJson != null){
 			try {
@@ -41,7 +43,7 @@ public class Wrapper {
 						Map.class);
 			} catch (IOException e) {
 				//TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new WrappingException(e.getMessage());
 			}
 		}
 		return map;
