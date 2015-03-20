@@ -1,8 +1,10 @@
 package Controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import persistence.RouteRepository;
 import persistence.exception.*;
 import persistence.mysql.RouteMySQL;
@@ -10,8 +12,10 @@ import persistence.fs.*;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
+import utils.Thumbnail;
 import model.Route;
 import model.Views;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,10 +25,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import Controller.exception.UncheckedControllerException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * RESTful Route Endpoint
@@ -117,7 +124,15 @@ public class RouteServicesImpl implements RouteServices {
 								"Error saving file to filesystem"
 										+ e.getMessage(), e);
 					}
-
+					
+					Thumbnail urlGenerator = new Thumbnail();
+					try {
+						route.setImgUrl(urlGenerator.getEncodedPolylineURL(gpxString));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+					
 					if (url != null) {
 						route.setUrl(url);
 						try {
