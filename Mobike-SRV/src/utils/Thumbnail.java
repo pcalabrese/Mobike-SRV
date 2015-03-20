@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Thumbnail {
 	private static final int maxEncodedPoints = 100;
-	private static final String staticMapURL = "https://maps.googleapis.com/maps/api/staticmap?size=100x100&path=weight:5%7Ccolor:0xff0000ff%7Cenc:";
+	private static final String staticMapURL = "https://maps.googleapis.com/maps/api/staticmap?path=weight:5%7Ccolor:0xff0000ff%7Cenc:";
 	
 	public Thumbnail() { };
 	

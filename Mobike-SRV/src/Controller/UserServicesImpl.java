@@ -3,8 +3,11 @@ package Controller;
 import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.UserMySQL;
+import model.Event;
+import model.Route;
 import model.User;
 import model.Views;
+
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,10 +17,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import utils.Authenticator;
 import utils.Crypter;
+import utils.Wrapper;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -428,4 +436,140 @@ public class UserServicesImpl implements UserServices {
 			return Response.status(400).build();
 		}
 	}
+
+	@GET
+	@Path("/myevents")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMyEvents(@QueryParam("token") String cryptedJson) {
+		
+		if(cryptedJson != null){
+			Authenticator auth = new Authenticator();
+			boolean exists = false;
+			
+			try {
+				exists = auth.validateCryptedUser(cryptedJson);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if(exists){
+				ObjectMapper mapper = new ObjectMapper();
+				Crypter crypter = new Crypter();
+				List<Event> myevents = null;
+				
+				try {
+					long userid = mapper.readValue(crypter.decrypt(cryptedJson), User.class).getId();
+					
+					myevents = userRep.userFromId(userid).getEventsOwned();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				if(myevents != null){
+					Map<String,String> map = new HashMap<String,String>();
+					mapper.setConfig(mapper.getSerializationConfig().withView(Views.EventGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+					String cryptedEventsJson = null;
+					
+					try {
+						cryptedEventsJson = crypter.encrypt(mapper.writeValueAsString(myevents));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
+					map.put("events", cryptedEventsJson);
+					Wrapper wrapper = new Wrapper();
+					
+					String wrappingJson = null;
+					try {
+						wrappingJson = wrapper.wrap(map);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					return Response.ok(wrappingJson, MediaType.APPLICATION_JSON).build();					
+					
+				} else {
+					return Response.status(404).build();
+				}
+				
+			} else {
+				return Response.status(401).build();
+			}
+				
+		}
+		else{
+			return Response.status(400).build();
+		}
+	}
+
+	@GET
+	@Path("/myroutes")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMyRoutes(@QueryParam("token") String cryptedJson) {
+		
+		if(cryptedJson != null){
+			Authenticator auth = new Authenticator();
+			boolean exists = false;
+			
+			try {
+				exists = auth.validateCryptedUser(cryptedJson);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			if(exists){
+				ObjectMapper mapper = new ObjectMapper();
+				Crypter crypter = new Crypter();
+				List<Route> myroutes = null;
+				
+				try {
+					long userid = mapper.readValue(crypter.decrypt(cryptedJson), User.class).getId();
+					
+					myroutes = userRep.userFromId(userid).getRouteList();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				if(myroutes != null){
+					Map<String,String> map = new HashMap<String,String>();
+					mapper.setConfig(mapper.getSerializationConfig().withView(Views.ItineraryGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+					String cryptedRoutesJson = null;
+					
+					try {
+						cryptedRoutesJson = crypter.encrypt(mapper.writeValueAsString(myroutes));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
+					map.put("routes", cryptedRoutesJson);
+					Wrapper wrapper = new Wrapper();
+					
+					String wrappingJson = null;
+					try {
+						wrappingJson = wrapper.wrap(map);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					return Response.ok(wrappingJson, MediaType.APPLICATION_JSON).build();					
+					
+				} else {
+					return Response.status(404).build();
+				}
+				
+			} else {
+				return Response.status(401).build();
+			}
+				
+		}
+		else{
+			return Response.status(400).build();
+		}
+	}
+
+
 }
