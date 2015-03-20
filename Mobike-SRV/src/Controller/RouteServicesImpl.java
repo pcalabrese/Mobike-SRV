@@ -6,12 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import persistence.RouteRepository;
-import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.RouteMySQL;
-import persistence.mysql.UserMySQL;
 import persistence.fs.*;
+import utils.Authenticator;
 import utils.Crypter;
+import utils.Wrapper;
+import utils.Thumbnail;
 import model.Route;
 import model.Views;
 
@@ -25,9 +26,12 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import Controller.exception.UncheckedControllerException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * RESTful Route Endpoint
@@ -63,94 +67,96 @@ public class RouteServicesImpl implements RouteServices {
 	 * @version 3.1
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	@POST
 	@Path("/create")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createRoute(String wrappingJson) {
 
-		if (wrappingJson != null) {
-			ObjectMapper mapper = new ObjectMapper();
-			Map<String, String> map = null;
+		Wrapper wrapper = new Wrapper();
+		Map<String, String> map = null;
 
-			try {
-				map = (Map<String, String>) mapper.readValue(wrappingJson,
-						Map.class);
-			} catch (IOException e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			String cryptedJson = null;
-			cryptedJson = map.get("route");
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-			Crypter crypter = new Crypter();
+		if (map != null) {
 
-			String json = null;
-			try {
-				json = crypter.decrypt(cryptedJson);
-			} catch (Exception e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
+			if (map.containsKey("route") & map.containsKey("user")) {
 
-			Route route = null;
+				Authenticator auth = new Authenticator();
+				Crypter crypter = new Crypter();
+				ObjectMapper mapper = new ObjectMapper();
+				boolean authorized = false;
 
-			try {
-				route = mapper.readValue(json, Route.class);
-			} catch(Exception e){
-				throw new UncheckedPersistenceException("Error accessing routes database", e);
-			}
-
-			
-
-
-			UserRepository userRepo = new UserMySQL();
-			boolean exists = false;
-			try {
-				exists = userRepo.userExists(route.getOwner().getId(), route
-						.getOwner().getNickname());
-			} catch (PersistenceException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			if (exists) {
-
-				String gpxString = route.getGpxString();
-				String url = null;
-				long insertedId = -1;
+				Route route = null;
 
 				try {
-					RouteIO writer = new GpxIO();
-					url = writer.write(gpxString, route.getName());
+					route = mapper.readValue(crypter.decrypt(map.get("route")),
+							Route.class);
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 
-				catch (Exception e) {
-					throw new UncheckedFilesystemException(
-							"Error saving file to filesystem" + e.getMessage(),
-							e);
+				try {
+					authorized = auth.isAuthorized(route.getOwner().getId(),
+							map.get("user"));
+				} catch (Exception e) {
+					e.printStackTrace();
+
 				}
 
-				if (url != null) {
-					route.setUrl(url);
+				if (authorized) {
+
+					String gpxString = route.getGpxString();
+					String url = null;
+					long insertedId = -1;
+
 					try {
-						insertedId = routeRep.addRoute(route);
+						RouteIO writer = new GpxIO();
+						url = writer.write(gpxString, route.getName());
+					}
 
-					} catch (Exception e) {
-						throw new UncheckedPersistenceException(
-								"Error adding route to database"
+					catch (Exception e) {
+						throw new UncheckedFilesystemException(
+								"Error saving file to filesystem"
 										+ e.getMessage(), e);
 					}
+					
+					Thumbnail urlGenerator = new Thumbnail();
+					try {
+						route.setImgUrl(urlGenerator.getEncodedPolylineURL(gpxString));
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+					
+					if (url != null) {
+						route.setUrl(url);
+						try {
+							insertedId = routeRep.addRoute(route);
+
+						} catch (Exception e) {
+							throw new UncheckedPersistenceException(
+									"Error adding route to database"
+											+ e.getMessage(), e);
+						}
+					} else {
+						throw new UncheckedFilesystemException(
+								"GPX Url not reachable");
+					}
+
+					String outputId = "" + insertedId + "";
+					return Response.ok(outputId, MediaType.TEXT_PLAIN).build();
+
 				} else {
-					throw new UncheckedFilesystemException(
-							"GPX Url not reachable");
+					return Response.status(401).build();
 				}
 
-				String outputId = "" + insertedId + "";
-				return Response.ok(outputId, MediaType.TEXT_PLAIN).build();
 			} else {
-
-				return Response.status(401).build();
+				return Response.status(400).build();
 			}
 
 		} else {
@@ -219,8 +225,8 @@ public class RouteServicesImpl implements RouteServices {
 						Views.ItineraryDetailView.class).writeValueAsString(
 						route);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 
 			Crypter crypter = new Crypter();
@@ -228,19 +234,19 @@ public class RouteServicesImpl implements RouteServices {
 			try {
 				cryptedJson = crypter.encrypt(json);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("route", cryptedJson);
 
-			objectMapper = new ObjectMapper();
+			Wrapper wrapper = new Wrapper();
 			String outputJson = null;
 			try {
-				outputJson = objectMapper.writeValueAsString(map);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				outputJson = wrapper.wrap(map);
+			} catch (Exception e) {
 				e.printStackTrace();
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
@@ -293,8 +299,8 @@ public class RouteServicesImpl implements RouteServices {
 						Views.ItineraryGeneralView.class).writeValueAsString(
 						allRoutes);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 
 			Crypter crypter = new Crypter();
@@ -302,19 +308,19 @@ public class RouteServicesImpl implements RouteServices {
 			try {
 				cryptedJson = crypter.encrypt(json);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("routes", cryptedJson);
-			objectMapper = new ObjectMapper();
+			Wrapper wrapper = new Wrapper();
 			String outputJson = null;
 
 			try {
-				outputJson = objectMapper.writeValueAsString(map);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				outputJson = wrapper.wrap(map);
+			} catch (Exception e) {
 				e.printStackTrace();
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
@@ -343,7 +349,9 @@ public class RouteServicesImpl implements RouteServices {
 		String json = null;
 
 		try {
-			allRoutes = routeRep.searchRouteByCriteria(startLocation, endLocation, minLength, maxLength, minDuration, maxDuration, type);
+			allRoutes = routeRep.searchRouteByCriteria(startLocation,
+					endLocation, minLength, maxLength, minDuration,
+					maxDuration, type);
 		} catch (Exception e) {
 			throw new UncheckedPersistenceException(
 					"Error accessing route database", e);
@@ -362,8 +370,8 @@ public class RouteServicesImpl implements RouteServices {
 						Views.ItineraryGeneralView.class).writeValueAsString(
 						allRoutes);
 			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw new UncheckedControllerException("Error Writing JSON");
 			}
 
 			Crypter crypter = new Crypter();
@@ -371,19 +379,19 @@ public class RouteServicesImpl implements RouteServices {
 			try {
 				cryptedJson = crypter.encrypt(json);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("routes", cryptedJson);
-			objectMapper = new ObjectMapper();
+			Wrapper wrapper = new Wrapper();
 			String outputJson = null;
 
 			try {
-				outputJson = objectMapper.writeValueAsString(map);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				outputJson = wrapper.wrap(map);
+			} catch (Exception e) {
 				e.printStackTrace();
+				
 			}
 
 			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
