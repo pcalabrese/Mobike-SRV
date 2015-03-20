@@ -1,7 +1,9 @@
 package utils;
 
 
+import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Wrapper {
@@ -27,7 +29,8 @@ public class Wrapper {
 	public Map<String, String> unwrap(String wrappingJson) throws Exception {
 		Map<String, String> map = null;
 		if (wrappingJson != null) {
-			map = (Map<String, String>) mapper.readValue(wrappingJson,
+			map = new HashMap<String, String>();
+			map = (HashMap<String, String>) mapper.readValue(wrappingJson,
 					Map.class);
 		}
 		return map;

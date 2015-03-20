@@ -41,6 +41,8 @@ public interface EventsServices{
 	public Response retrieveAllEventsWithState(String cryptedJson);
 
 	public Response updateEvent(String wrappingJson);
+
+	public Response setParticipation(String wrappingJson, String op);
 	
 	
 	

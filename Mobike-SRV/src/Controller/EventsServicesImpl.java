@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import persistence.EventRepository;
+import persistence.UserRepository;
 import persistence.exception.*;
 import persistence.mysql.EventMySQL;
+import persistence.mysql.UserMySQL;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
@@ -17,6 +19,7 @@ import utils.exception.UncheckedAuthenticationException;
 import model.Event;
 import model.User;
 import model.Views;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -173,7 +177,6 @@ public class EventsServicesImpl implements EventsServices {
 
 		if (cryptedJson != null) {
 
-			
 			Authenticator auth = new Authenticator();
 			boolean exists = false;
 			try {
@@ -181,75 +184,76 @@ public class EventsServicesImpl implements EventsServices {
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
-			
+
 			if (exists) {
-					Crypter crypter = new Crypter();
-					ObjectMapper mapper = new ObjectMapper();
-					User user = null;
-					
-					try {
-						user = mapper.readValue(crypter.decrypt(cryptedJson), User.class);
-					} catch (Exception e2) {
-						e2.printStackTrace();
+				Crypter crypter = new Crypter();
+				ObjectMapper mapper = new ObjectMapper();
+				User user = null;
+
+				try {
+					user = mapper.readValue(crypter.decrypt(cryptedJson),
+							User.class);
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+
+				List<Event> allEvents = null;
+				EventRepository eventRep = new EventMySQL();
+				try {
+					allEvents = eventRep.getAllEvents();
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+
+				if (!(allEvents.isEmpty())) {
+					for (Event e : allEvents) {
+						e.setUserStateByUserId(user.getId());
 					}
-					
-					List<Event> allEvents = null;
-					EventRepository eventRep = new EventMySQL();
+
+					mapper.setConfig(mapper.getSerializationConfig().withView(
+							Views.EventGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+							false);
+
+					String json = null;
 					try {
-						allEvents = eventRep.getAllEvents();
+						json = mapper.writeValueAsString(allEvents);
+					} catch (JsonProcessingException e) {
+						e.printStackTrace();
+					}
+
+					String cryptedOutputJson = null;
+					try {
+						cryptedOutputJson = crypter.encrypt(json);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 
-					if (!(allEvents.isEmpty())) {
-						for (Event e : allEvents) {
-							e.setUserStateByUserId(user.getId());
-						}
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("event", cryptedOutputJson);
+					Wrapper wrapper = new Wrapper();
+					String jsonOutput = null;
 
-						mapper.setConfig(mapper.getSerializationConfig()
-								.withView(Views.EventGeneralView.class));
-						mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
-								false);
-
-						String json = null;
-						try {
-							json = mapper.writeValueAsString(allEvents);
-						} catch (JsonProcessingException e) {
-							e.printStackTrace();
-						}
-
-						String cryptedOutputJson = null;
-						try {
-							cryptedOutputJson = crypter.encrypt(json);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-
-						Map<String, String> map = new HashMap<String, String>();
-						map.put("event", cryptedOutputJson);
-						Wrapper wrapper = new Wrapper();
-						String jsonOutput = null;
-
-						try {
-							jsonOutput = wrapper.wrap(map);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-						return Response.ok(jsonOutput,MediaType.APPLICATION_JSON).build();
-
-					} else {
-						return Response.status(404).build();
+					try {
+						jsonOutput = wrapper.wrap(map);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 
+					return Response.ok(jsonOutput, MediaType.APPLICATION_JSON)
+							.build();
+
 				} else {
-					return Response.status(401).build();
+					return Response.status(404).build();
 				}
 
 			} else {
-				return Response.status(400).build();
+				return Response.status(401).build();
 			}
 
+		} else {
+			return Response.status(400).build();
+		}
 
 	}
 
@@ -357,15 +361,16 @@ public class EventsServicesImpl implements EventsServices {
 				Event event = null;
 
 				try {
-					event = mapper.readValue(
-							crypter.decrypt(map.get("event")), Event.class);
+					event = mapper.readValue(crypter.decrypt(map.get("event")),
+							Event.class);
 				} catch (Exception e2) {
 					e2.printStackTrace();
 				}
 
 				boolean authorized = false;
 				try {
-					authorized = auth.isAuthorized(event.getOwner().getId(), map.get("user"));
+					authorized = auth.isAuthorized(event.getOwner().getId(),
+							map.get("user"));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -457,4 +462,104 @@ public class EventsServicesImpl implements EventsServices {
 		}
 	}
 
+	@Override
+	@POST
+	@Path("/participation")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response setParticipation(String wrappingJson, @QueryParam("op") String op) {
+
+		Wrapper wrapper = new Wrapper();
+
+		Map<String, String> map = null;
+		try {
+			map = wrapper.unwrap(wrappingJson);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		if (map != null) {
+
+			if (map.get("event") != null & map.get("user") != null) {
+
+				ObjectMapper mapper = new ObjectMapper();
+				Event event = null;
+				User user = null;
+				Crypter crypter = new Crypter();
+				UserRepository userRep = new UserMySQL();
+				try {
+					event = mapper.readValue(crypter.decrypt(map.get("event")),
+							Event.class);
+					user = mapper.readValue(crypter.decrypt(map.get("user")),
+							User.class);
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+
+				User u2 = null;
+				Event e2 = null;
+				try {
+					u2 = userRep.userFromId(user.getId());
+					e2 = eventRep.eventFromId(event.getId());
+				} catch (PersistenceException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+				boolean ok = false;
+				if (u2 != null && e2 != null) {
+					if (op == "accept") {
+						if (e2.getUsersInvited().contains(u2)) {
+							ok = true;
+							e2.getUsersAccepted().add(u2);
+							if (e2.getUsersRefused().contains(u2)) {
+								e2.getUsersRefused().remove(u2);
+							}
+						} else {
+							Response.status(401).build();
+						}
+					} else {
+						if (op == "decline") {
+							if (e2.getUsersInvited().contains(u2)) {
+								ok = true;
+								e2.getUsersRefused().add(u2);
+								if (e2.getUsersAccepted().contains(u2)) {
+									e2.getUsersAccepted().remove(u2);
+								}
+							} else {
+								Response.status(401).build();
+							}
+						}
+					}
+
+					if (ok) {
+						try {
+							eventRep.updateEvent(e2);
+
+						} catch (PersistenceException e) {
+							e.printStackTrace();
+							throw new UncheckedPersistenceException(
+									"Error updating event");
+						}
+
+						return Response.ok().build();
+					} else {
+						return Response.status(400).build();
+					}
+
+				} // user e event dal db ==null
+				else {
+					return Response.status(404).build();
+				}
+
+			} // map.get("event") e get("user") ==null
+			else {
+				return Response.status(400).build();
+			}
+
+		} // map==null
+		else {
+			return Response.status(400).build();
+		}
+
+	} // chiude metodo
 }
