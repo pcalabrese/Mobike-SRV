@@ -139,14 +139,15 @@ public class EventMySQL implements EventRepository{
 		
 		em.getTransaction().begin();
 		
-		event.setName(e.getName());
+		event = e;
+		/*event.setName(e.getName());
 		event.setDescription(e.getDescription());
 		event.setStartdate(e.getStartdate());
 		event.setStartlocation(e.getStartlocation());
 		event.setCreationdate(e.getCreationdate());
 		event.setUsersInvited(e.getUsersInvited());
 		event.setUsersAccepted(e.getUsersAccepted());
-		event.setUserRefused(e.getUserRefused());
+		event.setUserRefused(e.getUserRefused());*/
 		
 		em.getTransaction().commit();
 	

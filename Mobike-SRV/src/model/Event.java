@@ -213,11 +213,11 @@ public class Event implements Serializable {
     }
 
     @XmlTransient
-    public List<User> getUserRefused() {
+    public List<User> getUsersRefused() {
         return usersRefused;
     }
 
-    public void setUserRefused(List<User> userRefused) {
+    public void setUsersRefused(List<User> userRefused) {
         this.usersRefused = userRefused;
     }
 
