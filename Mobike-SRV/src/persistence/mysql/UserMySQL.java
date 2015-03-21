@@ -29,6 +29,19 @@ public class UserMySQL implements UserRepository {
 		user = query.getSingleResult();
 		return user;
 	}
+	
+	@Override
+	public boolean nicknameAvailable(String nickname) throws PersistenceException {
+		TypedQuery<User> query = em.createNamedQuery("User.findByNickname", User.class);
+		query.setParameter("nickname", nickname);
+		
+		if(query.getResultList().isEmpty())
+			return true;
+		else
+			return false;
+		
+		
+	}
 
 	@Override
 	public List<User> getAllUsers() throws PersistenceException {

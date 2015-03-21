@@ -57,48 +57,59 @@ public class UserServicesImpl implements UserServices {
 			@NotNull @QueryParam("token") String cryptedJson) {
 
 		if (cryptedJson != null) {
-			Crypter crypter = new Crypter();
-			String json = null;
-			try {
-				json = crypter.decrypt(cryptedJson);
-			} catch (Exception e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
-			ObjectMapper mapper = new ObjectMapper();
-			User user = null;
+
+			Authenticator auth = new Authenticator();
+			boolean authorized = false;
 
 			try {
-				user = mapper.readValue(json, User.class);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
+				authorized = auth.isAuthorized(id, cryptedJson);
+			} catch (Exception e1) {
+
 				e1.printStackTrace();
 			}
 
-			if (user.getId() == id) {
-				User user1 = null;
+			if (authorized) {
+				User user = null;
 				try {
 
-					user1 = userRep.userFromId(id);
+					user = userRep.userFromId(id);
 				} catch (Exception e) {
 					throw new UncheckedPersistenceException(
 							"Error accessing user database" + e.getMessage());
 				}
 
-				mapper.setConfig(mapper.getSerializationConfig().withView(
-						Views.UserDetailView.class));
-				mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
-				String jsonOutput = null;
-				try {
-					jsonOutput = mapper.writerWithView(
-							Views.UserDetailView.class).writeValueAsString(
-							user1);
-				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (user != null) {
+
+					ObjectMapper mapper = new ObjectMapper();
+					mapper.setConfig(mapper.getSerializationConfig().withView(
+							Views.UserDetailView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+							false);
+					Map<String, String> map = null;
+					String wrappingJson = null;
+					try {
+						Crypter crypter = new Crypter();
+						String cryptedUserJson = crypter.encrypt(mapper
+								.writerWithView(Views.UserDetailView.class)
+								.writeValueAsString(user));
+
+						map = new HashMap<String, String>();
+						map.put("user", cryptedUserJson);
+
+						Wrapper wrapper = new Wrapper();
+						wrappingJson = wrapper.wrap(map);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					return Response
+							.ok(wrappingJson, MediaType.APPLICATION_JSON)
+							.build();
+
+				} else {
+					return Response.status(404).build();
 				}
-				return Response.ok(jsonOutput, MediaType.APPLICATION_JSON)
-						.build();
 			} else {
 				return Response.status(401).build();
 			}
@@ -114,43 +125,21 @@ public class UserServicesImpl implements UserServices {
 	public Response getAllUsers(@QueryParam("token") String cryptedJson) {
 		// if param is != null start the decryption
 		if (cryptedJson != null) {
-			Crypter crypter = new Crypter();
-			String json = null;
 
-			try {
-				json = crypter.decrypt(cryptedJson);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			// after decryption, map the json to a User Object
-			ObjectMapper mapper = new ObjectMapper();
-			User user = null;
-			try {
-				user = mapper.readValue(json, User.class);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			// check if User exists in Persistence
+			Authenticator auth = new Authenticator();
 			boolean exists = false;
 			try {
-				exists = userRep.userExists(user.getId(), user.getNickname());
-			} catch (PersistenceException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				exists = auth.validateCryptedUser(cryptedJson);
+			} catch (Exception e1) {
+				e1.printStackTrace();
 			}
 
-			// if exists then get the User's List, map it to json, encrypt and
-			// return a Response.ok
 			if (exists) {
+				ObjectMapper mapper = new ObjectMapper();
 				List<User> users = null;
 				try {
 					users = userRep.getAllUsers();
 				} catch (PersistenceException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -158,41 +147,35 @@ public class UserServicesImpl implements UserServices {
 						Views.UserGeneralView.class));
 				mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
 
-				String usersJson = null;
+				String cryptedUsersJson = null;
+				Crypter crypter = new Crypter();
+
 				try {
-					usersJson = mapper.writeValueAsString(users);
-				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
+					cryptedUsersJson = crypter.encrypt(mapper
+							.writeValueAsString(users));
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
-				String cryptedUsersJson = null;
-				try {
-					cryptedUsersJson = crypter.encrypt(usersJson);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				mapper = new ObjectMapper();
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("users", cryptedUsersJson);
+				Wrapper wrapper = new Wrapper();
 				String cryptedJsonOutput = null;
 				try {
-					cryptedJsonOutput = mapper.writeValueAsString(map);
-				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
+					cryptedJsonOutput = wrapper.wrap(map);
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 
 				return Response.ok(cryptedJsonOutput,
 						MediaType.APPLICATION_JSON).build();
 			}
-			// else Return Response 401 Unauthorized
+
 			else {
 				return Response.status(401).build();
 			}
 		}
-		// if param is == null return Response 400 Bad Request
+
 		else {
 			return Response.status(400).build();
 		}
@@ -207,7 +190,6 @@ public class UserServicesImpl implements UserServices {
 	public Response createUser(String cryptedJson) {
 
 		if (cryptedJson != null) {
-
 			ObjectMapper mapper = new ObjectMapper();
 			Map<String, String> map = null;
 
@@ -215,84 +197,81 @@ public class UserServicesImpl implements UserServices {
 				map = (Map<String, String>) mapper.readValue(cryptedJson,
 						Map.class);
 			} catch (IOException e5) {
-				// TODO Auto-generated catch block
 				e5.printStackTrace();
 			}
-			String userCryptedJson = map.get("user");
 
-			if (userCryptedJson != null) {
+			if (map.get("user") != null) {
 				Crypter crypter = new Crypter();
-				String userJson = null;
-				try {
-					userJson = crypter.decrypt(userCryptedJson);
-				} catch (Exception e4) {
-					// TODO Auto-generated catch block
-					e4.printStackTrace();
-				}
-
 				User user = null;
 				try {
-					user = mapper.readValue(userJson, User.class);
-				} catch (IOException e3) {
-					// TODO Auto-generated catch block
-					e3.printStackTrace();
-				}
+					user = mapper.readValue(crypter.decrypt(map.get("user")),
+							User.class);
+				} catch (Exception e4) {
 
+					e4.printStackTrace();
+				}
 				if (user.getEmail() != null & user.getName() != null
 						& user.getNickname() != null
 						& user.getSurname() != null) {
-					long insertedId = -1;
+
+					boolean availableNick = false;
+
 					try {
-						insertedId = userRep.addUser(user);
-					} catch (Exception e) {
-						throw new UncheckedPersistenceException(
-								"Error adding user in database"
-										+ e.getMessage());
+						availableNick = userRep.nicknameAvailable(user
+								.getNickname());
+					} catch (PersistenceException e3) {
+						e3.printStackTrace();
 					}
 
-					if (insertedId != -1)
-						user.setId(insertedId);
-					else {
-						return Response.status(500).build();
+					if (availableNick) {
+						long insertedId = -1;
+						try {
+							insertedId = userRep.addUser(user);
+						} catch (Exception e) {
+							throw new UncheckedPersistenceException(
+									"Error adding user in database"
+											+ e.getMessage());
+						}
+
+						if (insertedId != -1)
+							user.setId(insertedId);
+						else {
+							return Response.status(500).build();
+						}
+
+						mapper = new ObjectMapper();
+						mapper.setConfig(mapper.getSerializationConfig()
+								.withView(Views.UserGeneralView.class));
+						mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+								false);
+
+						String cryptedInsertedUserJson = null;
+						try {
+							cryptedInsertedUserJson = crypter
+									.encrypt(mapper.writerWithView(
+											Views.UserGeneralView.class)
+											.writeValueAsString(user));
+						} catch (Exception e1) {
+
+							e1.printStackTrace();
+						}
+
+						Map<String, String> map1 = new HashMap<String, String>();
+						map1.put("user", cryptedInsertedUserJson);
+
+						String jsonOutput = null;
+						try {
+							jsonOutput = mapper.writeValueAsString(map1);
+						} catch (JsonProcessingException e) {
+							
+							e.printStackTrace();
+						}
+
+						return Response.ok(jsonOutput,
+								MediaType.APPLICATION_JSON).build();
+					} else {
+						return Response.status(409).build();
 					}
-
-					String insertedUserJson = null;
-					mapper = new ObjectMapper();
-					mapper.setConfig(mapper.getSerializationConfig().withView(
-							Views.UserGeneralView.class));
-					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
-							false);
-					try {
-						insertedUserJson = mapper.writerWithView(
-								Views.UserGeneralView.class)
-								.writeValueAsString(user);
-					} catch (JsonProcessingException e2) {
-						// TODO Auto-generated catch block
-						e2.printStackTrace();
-					}
-
-					String cryptedInsertedUserJson = null;
-					try {
-						cryptedInsertedUserJson = crypter
-								.encrypt(insertedUserJson);
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-
-					Map<String, String> map1 = new HashMap<String, String>();
-					map1.put("user", cryptedInsertedUserJson);
-
-					String jsonOutput = null;
-					try {
-						jsonOutput = mapper.writeValueAsString(map1);
-					} catch (JsonProcessingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-					return Response.ok(jsonOutput, MediaType.APPLICATION_JSON)
-							.build();
 
 				} else {
 					return Response.status(400).build();
@@ -331,29 +310,29 @@ public class UserServicesImpl implements UserServices {
 			try {
 				json = crypter.decrypt(cryptedJson);
 			} catch (Exception e1) {
-				// TODO Auto-generated catch block
+				
 				e1.printStackTrace();
 			}
-			
+
 			User user = null;
 			try {
 				user = mapper.readValue(json, User.class);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
+				
 				e1.printStackTrace();
 			}
-			
-			
+
 			User user1 = null;
-			if(user.getEmail()!=null){
+			if (user.getEmail() != null) {
 				boolean exists = false;
 				try {
 					exists = userRep.userExists(user.getEmail());
 				} catch (Exception e) {
 					throw new UncheckedPersistenceException(
-							"Error checking user account email " + e.getMessage());
+							"Error checking user account email "
+									+ e.getMessage());
 				}
-				
+
 				if (exists) {
 					try {
 						user1 = userRep.userFromEmail(user.getEmail());
@@ -361,40 +340,41 @@ public class UserServicesImpl implements UserServices {
 						throw new UncheckedPersistenceException(
 								"Error checking user account" + e.getMessage());
 					}
-				}
-				else {
+				} else {
 					return Response.status(401).build();
 				}
-			}
-			else {
-				if(user.getId() != null & user.getNickname()!=null){
+			} else {
+				if (user.getId() != null & user.getNickname() != null) {
 					boolean exists2 = false;
 					try {
-						exists2 = userRep.userExists(user.getId(), user.getNickname());
+						exists2 = userRep.userExists(user.getId(),
+								user.getNickname());
 					} catch (Exception e) {
 						throw new UncheckedPersistenceException(
-								"Error checking user account id and nickname " + e.getMessage());
+								"Error checking user account id and nickname "
+										+ e.getMessage());
 					}
-					
+
 					if (exists2) {
 						try {
 							user1 = userRep.userFromId(user.getId());
 						} catch (Exception e) {
 							throw new UncheckedPersistenceException(
-									"Error checking user account" + e.getMessage());
+									"Error checking user account"
+											+ e.getMessage());
 						}
 					} else {
 						return Response.status(401).build();
-					}	
-				}
-				else{
+					}
+				} else {
 					return Response.status(400).build();
 				}
 			}
 
 			if (user1 != null) {
-				
-				mapper.setConfig(mapper.getSerializationConfig().withView(Views.UserGeneralView.class));
+
+				mapper.setConfig(mapper.getSerializationConfig().withView(
+						Views.UserGeneralView.class));
 				mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
 
 				String jsonOutput = null;
@@ -403,14 +383,14 @@ public class UserServicesImpl implements UserServices {
 							Views.UserGeneralView.class).writeValueAsString(
 							user1);
 				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 				String cryptedOutput = null;
 				try {
 					cryptedOutput = crypter.encrypt(jsonOutput);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 
@@ -421,17 +401,16 @@ public class UserServicesImpl implements UserServices {
 				try {
 					cryptedjsonOutput = mapper.writeValueAsString(map);
 				} catch (JsonProcessingException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 				return Response.ok(cryptedjsonOutput,
 						MediaType.APPLICATION_JSON).build();
-			} 
-			else {
+			} else {
 				return Response.status(500).build();
 			}
-		} 
-		
+		}
+
 		else {
 			return Response.status(400).build();
 		}
@@ -441,65 +420,69 @@ public class UserServicesImpl implements UserServices {
 	@Path("/myevents")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMyEvents(@QueryParam("token") String cryptedJson) {
-		
-		if(cryptedJson != null){
+
+		if (cryptedJson != null) {
 			Authenticator auth = new Authenticator();
 			boolean exists = false;
-			
+
 			try {
 				exists = auth.validateCryptedUser(cryptedJson);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			if(exists){
+
+			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
 				Crypter crypter = new Crypter();
 				List<Event> myevents = null;
-				
+
 				try {
-					long userid = mapper.readValue(crypter.decrypt(cryptedJson), User.class).getId();
-					
+					long userid = mapper.readValue(
+							crypter.decrypt(cryptedJson), User.class).getId();
+
 					myevents = userRep.userFromId(userid).getEventsOwned();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				if(myevents != null){
-					Map<String,String> map = new HashMap<String,String>();
-					mapper.setConfig(mapper.getSerializationConfig().withView(Views.EventGeneralView.class));
-					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+
+				if (myevents != null) {
+					Map<String, String> map = new HashMap<String, String>();
+					mapper.setConfig(mapper.getSerializationConfig().withView(
+							Views.EventGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+							false);
 					String cryptedEventsJson = null;
-					
+
 					try {
-						cryptedEventsJson = crypter.encrypt(mapper.writeValueAsString(myevents));
+						cryptedEventsJson = crypter.encrypt(mapper
+								.writeValueAsString(myevents));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
-					
+
 					map.put("events", cryptedEventsJson);
 					Wrapper wrapper = new Wrapper();
-					
+
 					String wrappingJson = null;
 					try {
 						wrappingJson = wrapper.wrap(map);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
-					return Response.ok(wrappingJson, MediaType.APPLICATION_JSON).build();					
-					
+
+					return Response
+							.ok(wrappingJson, MediaType.APPLICATION_JSON)
+							.build();
+
 				} else {
 					return Response.status(404).build();
 				}
-				
+
 			} else {
 				return Response.status(401).build();
 			}
-				
-		}
-		else{
+
+		} else {
 			return Response.status(400).build();
 		}
 	}
@@ -508,68 +491,71 @@ public class UserServicesImpl implements UserServices {
 	@Path("/myroutes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMyRoutes(@QueryParam("token") String cryptedJson) {
-		
-		if(cryptedJson != null){
+
+		if (cryptedJson != null) {
 			Authenticator auth = new Authenticator();
 			boolean exists = false;
-			
+
 			try {
 				exists = auth.validateCryptedUser(cryptedJson);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			if(exists){
+
+			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
 				Crypter crypter = new Crypter();
 				List<Route> myroutes = null;
-				
+
 				try {
-					long userid = mapper.readValue(crypter.decrypt(cryptedJson), User.class).getId();
-					
+					long userid = mapper.readValue(
+							crypter.decrypt(cryptedJson), User.class).getId();
+
 					myroutes = userRep.userFromId(userid).getRouteList();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				if(myroutes != null){
-					Map<String,String> map = new HashMap<String,String>();
-					mapper.setConfig(mapper.getSerializationConfig().withView(Views.ItineraryGeneralView.class));
-					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+
+				if (myroutes != null) {
+					Map<String, String> map = new HashMap<String, String>();
+					mapper.setConfig(mapper.getSerializationConfig().withView(
+							Views.ItineraryGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+							false);
 					String cryptedRoutesJson = null;
-					
+
 					try {
-						cryptedRoutesJson = crypter.encrypt(mapper.writeValueAsString(myroutes));
+						cryptedRoutesJson = crypter.encrypt(mapper
+								.writeValueAsString(myroutes));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
-					
+
 					map.put("routes", cryptedRoutesJson);
 					Wrapper wrapper = new Wrapper();
-					
+
 					String wrappingJson = null;
 					try {
 						wrappingJson = wrapper.wrap(map);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					
-					return Response.ok(wrappingJson, MediaType.APPLICATION_JSON).build();					
-					
+
+					return Response
+							.ok(wrappingJson, MediaType.APPLICATION_JSON)
+							.build();
+
 				} else {
 					return Response.status(404).build();
 				}
-				
+
 			} else {
 				return Response.status(401).build();
 			}
-				
-		}
-		else{
+
+		} else {
 			return Response.status(400).build();
 		}
 	}
-
 
 }

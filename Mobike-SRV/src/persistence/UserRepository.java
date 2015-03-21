@@ -49,4 +49,6 @@ public interface UserRepository {
 	public boolean userExists(String email) throws PersistenceException;
 	
 	public boolean userExists(long id, String nickname) throws PersistenceException;
+
+	boolean nicknameAvailable(String nickname) throws PersistenceException;
 }
