@@ -1,6 +1,8 @@
 package Controller;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +91,8 @@ public class RouteServicesImpl implements RouteServices {
 				Authenticator auth = new Authenticator();
 				Crypter crypter = new Crypter();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				boolean authorized = false;
 
 				Route route = null;
@@ -189,6 +193,8 @@ public class RouteServicesImpl implements RouteServices {
 		Route route = null;
 		RouteRepository routeREP = new RouteMySQL();
 		ObjectMapper objectMapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		objectMapper.setDateFormat(dateFormat);
 		String gpxString;
 		RouteIO fsrepo = new GpxIO();
 
@@ -277,6 +283,8 @@ public class RouteServicesImpl implements RouteServices {
 
 		List<Route> allRoutes = null;
 		ObjectMapper objectMapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		objectMapper.setDateFormat(dateFormat);
 		String json = null;
 
 		try {
@@ -346,6 +354,8 @@ public class RouteServicesImpl implements RouteServices {
 			@QueryParam("type") String type) {
 		List<Route> allRoutes = null;
 		ObjectMapper objectMapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		objectMapper.setDateFormat(dateFormat);
 		String json = null;
 
 		try {

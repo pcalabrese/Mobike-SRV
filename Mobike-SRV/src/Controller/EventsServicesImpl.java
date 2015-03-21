@@ -3,6 +3,8 @@
  */
 package Controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,8 @@ public class EventsServicesImpl implements EventsServices {
 				Crypter crypter = new Crypter();
 				Authenticator auth = new Authenticator();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Event event = null;
 
 				try {
@@ -130,6 +134,8 @@ public class EventsServicesImpl implements EventsServices {
 		if (!(allEvents.isEmpty())) {
 
 			ObjectMapper mapper = new ObjectMapper();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			mapper.setDateFormat(dateFormat);
 			mapper.setConfig(mapper.getSerializationConfig().withView(
 					Views.EventGeneralView.class));
 			mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
@@ -188,6 +194,8 @@ public class EventsServicesImpl implements EventsServices {
 			if (exists) {
 				Crypter crypter = new Crypter();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				User user = null;
 
 				try {
@@ -266,6 +274,8 @@ public class EventsServicesImpl implements EventsServices {
 		String json = null;
 		EventRepository eventRep = new EventMySQL();
 		ObjectMapper objectMapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		objectMapper.setDateFormat(dateFormat);
 
 		// take Event from db
 		try {
@@ -356,6 +366,8 @@ public class EventsServicesImpl implements EventsServices {
 
 				Authenticator auth = new Authenticator();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 
 				Event event = null;
@@ -419,6 +431,8 @@ public class EventsServicesImpl implements EventsServices {
 			if (map.get("event") != null & map.get("user") != null) {
 
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Event event = null;
 				Crypter crypter = new Crypter();
 				try {
@@ -482,6 +496,8 @@ public class EventsServicesImpl implements EventsServices {
 			if (map.get("event") != null & map.get("user") != null) {
 
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Event event = null;
 				User user = null;
 				Crypter crypter = new Crypter();

@@ -27,6 +27,8 @@ import utils.Crypter;
 import utils.Wrapper;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +83,8 @@ public class UserServicesImpl implements UserServices {
 				if (user != null) {
 
 					ObjectMapper mapper = new ObjectMapper();
+					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+					mapper.setDateFormat(dateFormat);
 					mapper.setConfig(mapper.getSerializationConfig().withView(
 							Views.UserDetailView.class));
 					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
@@ -136,6 +140,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				List<User> users = null;
 				try {
 					users = userRep.getAllUsers();
@@ -191,6 +197,8 @@ public class UserServicesImpl implements UserServices {
 
 		if (cryptedJson != null) {
 			ObjectMapper mapper = new ObjectMapper();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			mapper.setDateFormat(dateFormat);
 			Map<String, String> map = null;
 
 			try {
@@ -240,6 +248,7 @@ public class UserServicesImpl implements UserServices {
 						}
 
 						mapper = new ObjectMapper();
+						mapper.setDateFormat(dateFormat);
 						mapper.setConfig(mapper.getSerializationConfig()
 								.withView(Views.UserGeneralView.class));
 						mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
@@ -304,6 +313,8 @@ public class UserServicesImpl implements UserServices {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticateUser(@QueryParam("token") String cryptedJson) {
 		ObjectMapper mapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		mapper.setDateFormat(dateFormat);
 		if (cryptedJson != null) {
 			Crypter crypter = new Crypter();
 			String json = null;
@@ -397,6 +408,8 @@ public class UserServicesImpl implements UserServices {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("user", cryptedOutput);
 				mapper = new ObjectMapper();
+				
+				mapper.setDateFormat(dateFormat);
 				String cryptedjsonOutput = null;
 				try {
 					cryptedjsonOutput = mapper.writeValueAsString(map);
@@ -433,6 +446,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 				List<Event> myevents = null;
 
@@ -504,6 +519,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 				List<Route> myroutes = null;
 

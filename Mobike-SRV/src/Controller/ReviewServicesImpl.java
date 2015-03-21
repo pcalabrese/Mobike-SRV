@@ -1,13 +1,19 @@
 package Controller;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import model.Review;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import persistence.ReviewRepository;
 import persistence.exception.PersistenceException;
 import persistence.exception.UncheckedPersistenceException;
@@ -45,6 +51,8 @@ public class ReviewServicesImpl implements ReviewServices {
 
 				Authenticator auth = new Authenticator();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 
 				Review review = null;
@@ -108,6 +116,8 @@ public class ReviewServicesImpl implements ReviewServices {
 
 				Authenticator auth = new Authenticator();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 
 				Review review = null;
@@ -171,6 +181,8 @@ public class ReviewServicesImpl implements ReviewServices {
 
 				Authenticator auth = new Authenticator();
 				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 
 				Review review = null;
