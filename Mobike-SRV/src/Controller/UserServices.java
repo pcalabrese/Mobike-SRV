@@ -44,8 +44,10 @@ public interface UserServices{
 	 */
 	public String getUserEvents(long id);
 	
+	public Response getMyEvents(String cryptedJson);
+
+	public Response getMyRoutes(String cryptedJson);
 	
-	
-	
+	public Response getMyInvitations(String cryptedJson);
 }
 

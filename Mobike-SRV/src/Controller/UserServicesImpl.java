@@ -83,7 +83,8 @@ public class UserServicesImpl implements UserServices {
 				if (user != null) {
 
 					ObjectMapper mapper = new ObjectMapper();
-					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+					DateFormat dateFormat = new SimpleDateFormat(
+							"yyyy/MM/dd HH:mm:ss");
 					mapper.setDateFormat(dateFormat);
 					mapper.setConfig(mapper.getSerializationConfig().withView(
 							Views.UserDetailView.class));
@@ -140,7 +141,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
-				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				DateFormat dateFormat = new SimpleDateFormat(
+						"yyyy/MM/dd HH:mm:ss");
 				mapper.setDateFormat(dateFormat);
 				List<User> users = null;
 				try {
@@ -272,7 +274,7 @@ public class UserServicesImpl implements UserServices {
 						try {
 							jsonOutput = mapper.writeValueAsString(map1);
 						} catch (JsonProcessingException e) {
-							
+
 							e.printStackTrace();
 						}
 
@@ -321,7 +323,7 @@ public class UserServicesImpl implements UserServices {
 			try {
 				json = crypter.decrypt(cryptedJson);
 			} catch (Exception e1) {
-				
+
 				e1.printStackTrace();
 			}
 
@@ -329,7 +331,7 @@ public class UserServicesImpl implements UserServices {
 			try {
 				user = mapper.readValue(json, User.class);
 			} catch (IOException e1) {
-				
+
 				e1.printStackTrace();
 			}
 
@@ -394,27 +396,27 @@ public class UserServicesImpl implements UserServices {
 							Views.UserGeneralView.class).writeValueAsString(
 							user1);
 				} catch (JsonProcessingException e) {
-					
+
 					e.printStackTrace();
 				}
 				String cryptedOutput = null;
 				try {
 					cryptedOutput = crypter.encrypt(jsonOutput);
 				} catch (Exception e) {
-					
+
 					e.printStackTrace();
 				}
 
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("user", cryptedOutput);
 				mapper = new ObjectMapper();
-				
+
 				mapper.setDateFormat(dateFormat);
 				String cryptedjsonOutput = null;
 				try {
 					cryptedjsonOutput = mapper.writeValueAsString(map);
 				} catch (JsonProcessingException e) {
-					
+
 					e.printStackTrace();
 				}
 				return Response.ok(cryptedjsonOutput,
@@ -429,6 +431,7 @@ public class UserServicesImpl implements UserServices {
 		}
 	}
 
+	@Override
 	@GET
 	@Path("/myevents")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -446,7 +449,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
-				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				DateFormat dateFormat = new SimpleDateFormat(
+						"yyyy/MM/dd HH:mm:ss");
 				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 				List<Event> myevents = null;
@@ -502,6 +506,7 @@ public class UserServicesImpl implements UserServices {
 		}
 	}
 
+	@Override
 	@GET
 	@Path("/myroutes")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -519,7 +524,8 @@ public class UserServicesImpl implements UserServices {
 
 			if (exists) {
 				ObjectMapper mapper = new ObjectMapper();
-				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				DateFormat dateFormat = new SimpleDateFormat(
+						"yyyy/MM/dd HH:mm:ss");
 				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 				List<Route> myroutes = null;
@@ -549,6 +555,80 @@ public class UserServicesImpl implements UserServices {
 					}
 
 					map.put("routes", cryptedRoutesJson);
+					Wrapper wrapper = new Wrapper();
+
+					String wrappingJson = null;
+					try {
+						wrappingJson = wrapper.wrap(map);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					return Response
+							.ok(wrappingJson, MediaType.APPLICATION_JSON)
+							.build();
+
+				} else {
+					return Response.status(404).build();
+				}
+
+			} else {
+				return Response.status(401).build();
+			}
+
+		} else {
+			return Response.status(400).build();
+		}
+	}
+
+	@Override
+	@Path("/myinvitations")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMyInvitations(String cryptedJson) {
+		if (cryptedJson != null) {
+			Authenticator auth = new Authenticator();
+			boolean exists = false;
+
+			try {
+				exists = auth.validateCryptedUser(cryptedJson);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if (exists) {
+				ObjectMapper mapper = new ObjectMapper();
+				DateFormat dateFormat = new SimpleDateFormat(
+						"yyyy/MM/dd HH:mm:ss");
+				mapper.setDateFormat(dateFormat);
+				Crypter crypter = new Crypter();
+				List<Event> myeventsInv = null;
+
+				try {
+					long userid = mapper.readValue(
+							crypter.decrypt(cryptedJson), User.class).getId();
+
+					myeventsInv = userRep.userFromId(userid).getEventsInvited();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (myeventsInv != null) {
+					Map<String, String> map = new HashMap<String, String>();
+					mapper.setConfig(mapper.getSerializationConfig().withView(
+							Views.EventGeneralView.class));
+					mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION,
+							false);
+					String cryptedEventsJson = null;
+
+					try {
+						cryptedEventsJson = crypter.encrypt(mapper
+								.writeValueAsString(myeventsInv));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					map.put("events", cryptedEventsJson);
 					Wrapper wrapper = new Wrapper();
 
 					String wrappingJson = null;

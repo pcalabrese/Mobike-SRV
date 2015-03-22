@@ -238,7 +238,7 @@ public class EventsServicesImpl implements EventsServices {
 					}
 
 					Map<String, String> map = new HashMap<String, String>();
-					map.put("event", cryptedOutputJson);
+					map.put("events", cryptedOutputJson);
 					Wrapper wrapper = new Wrapper();
 					String jsonOutput = null;
 
