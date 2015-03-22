@@ -21,6 +21,8 @@ public class ReviewMySQL implements ReviewRepository {
 		Review review = null;
 		review = em.find(Review.class, id);
 		em.getTransaction().commit();
+		em.close();
+		
 
 		return review;
 	}
@@ -30,8 +32,10 @@ public class ReviewMySQL implements ReviewRepository {
 		em.getTransaction().begin();
 		Review review = null;
 		review = em.find(Review.class, id);
-		em.remove(review);
+		em.remove(review);	
+		review.getRoute().getReviewList().remove(review);
 		em.getTransaction().commit();
+		em.close();
 	}
 
 	@Override
@@ -40,6 +44,7 @@ public class ReviewMySQL implements ReviewRepository {
 		em.getTransaction().begin();
 		em.persist(r);
 		em.getTransaction().commit();
+		em.close();
 	}
 	
 	@Override
@@ -52,7 +57,11 @@ public class ReviewMySQL implements ReviewRepository {
 		review.setMessage(r.getMessage());
 		review.setRate(r.getRate());
 		
+		review.getRoute().getReviewList().remove(review);
+		review.getRoute().getReviewList().add(review);
+		
 		em.getTransaction().commit();
+		em.close();
 	
 	}
 

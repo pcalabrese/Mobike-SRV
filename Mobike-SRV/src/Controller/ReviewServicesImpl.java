@@ -203,7 +203,7 @@ public class ReviewServicesImpl implements ReviewServices {
 				}
 
 				if (authorized) {
-
+					System.out.println(review.getReviewPK().getRoutesId() + " " + review.getReviewPK().getUsersId());
 					try {
 						reviewRep.removeReviewFromId(review.getReviewPK());
 

@@ -35,15 +35,13 @@ public class EventMySQL implements EventRepository{
 		
 		results = query.getResultList();
 		
-		if(results==null){
-			return event;
+		if( results !=null && !(results.isEmpty())){
+			event = results.get(0);
+			
 		}
-		else {
-			if(!(results.isEmpty()))
-				return event = results.get(0);
-			else
-				return event;
-		}
+		em.close();
+		return event;
+		
 	}
 
 	/* 
@@ -58,7 +56,7 @@ public class EventMySQL implements EventRepository{
 		List<Event> events = null;
 		TypedQuery<Event> query = em.createNamedQuery("Event.findAll",Event.class);
 		events = query.getResultList();
-		
+		em.close();
 		return events;
 	}
 	

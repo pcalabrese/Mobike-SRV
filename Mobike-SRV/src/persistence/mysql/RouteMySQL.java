@@ -37,6 +37,7 @@ public class RouteMySQL implements RouteRepository{
 			else
 				return route;
 		}
+		
 	}
 
 	/* 
@@ -50,7 +51,7 @@ public class RouteMySQL implements RouteRepository{
 		TypedQuery<Route> query = em.createNamedQuery("Route.findAll",Route.class);
 		routes = query.getResultList();
 		
-		
+		em.close();
 		return routes;
 	}
 
@@ -66,7 +67,7 @@ public class RouteMySQL implements RouteRepository{
 		TypedQuery<Route> query = em.createNamedQuery("Route.findbyName",Route.class);
 		query.setParameter("name",name);
 		results = query.getResultList();
-		
+		em.close();
 		return results;
 	}
 
@@ -156,6 +157,7 @@ public class RouteMySQL implements RouteRepository{
 		
 		Query query = em.createNativeQuery(stringSQL,Route.class);
 		routes = query.getResultList();	
+		em.close();
 		return routes;
 	}
 	
