@@ -59,7 +59,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
     @NamedQuery(name = "Route.findByBends", query = "SELECT r FROM Route r WHERE r.bends = :bends"),
     @NamedQuery(name = "Route.findByStartlocation", query = "SELECT r FROM Route r WHERE r.startlocation = :startlocation"),
     @NamedQuery(name = "Route.findByEndlocation", query = "SELECT r FROM Route r WHERE r.endlocation = :endlocation")})
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Route implements Serializable {
     private static final long serialVersionUID = 1L;
     
