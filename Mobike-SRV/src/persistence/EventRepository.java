@@ -47,4 +47,6 @@ public interface EventRepository {
 	public void removeEventFromId(long id) throws PersistenceException;
 
 	public void updateEvent(Event e) throws PersistenceException;
+
+	public List<Event> getLastUploaded();
 }

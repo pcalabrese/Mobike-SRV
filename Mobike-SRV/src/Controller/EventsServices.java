@@ -43,6 +43,8 @@ public interface EventsServices{
 	public Response updateEvent(String wrappingJson);
 
 	public Response setParticipation(String wrappingJson, String op);
+
+	Response retrieveLastUploaded();
 	
 	
 	

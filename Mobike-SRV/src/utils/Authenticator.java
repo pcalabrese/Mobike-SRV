@@ -21,6 +21,7 @@ public class Authenticator {
 
 			
 				plainJson = crypter.decrypt(cryptedJson);
+				
 			
 
 			if (plainJson != null) {

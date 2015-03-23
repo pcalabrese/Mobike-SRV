@@ -209,11 +209,12 @@ public class ReviewServicesImpl implements ReviewServices {
 				}
 
 				if (authorized) {
-					System.out.println(review.getReviewPK().getRoutesId() + " " + review.getReviewPK().getUsersId());
+					long routeid = review.getReviewPK().getRoutesId();
 					try {
+						
 						reviewRep.removeReviewFromId(review.getReviewPK());
 						RouteRepository routeRep = new RouteMySQL();
-						routeRep.updateRates(review.getReviewPK().getRoutesId());
+						routeRep.updateRates(routeid);
 					} catch (PersistenceException e) {
 						e.printStackTrace();
 						throw new UncheckedPersistenceException(

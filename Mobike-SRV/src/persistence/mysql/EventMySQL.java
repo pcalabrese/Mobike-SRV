@@ -151,6 +151,18 @@ public class EventMySQL implements EventRepository{
 	
 	}
 	
+	@Override
+	@OrderBy("creationdate DESC")
+	public List<Event> getLastUploaded() {
+		
+		List<Event> events = null;
+		TypedQuery<Event> query = em.createNamedQuery("Event.findAll",Event.class);
+		query.setMaxResults(6);
+		events = query.getResultList();
+		
+		return events;
+	}
+	
 }
 
 

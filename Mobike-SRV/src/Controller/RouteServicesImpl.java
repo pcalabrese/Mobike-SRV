@@ -132,11 +132,13 @@ public class RouteServicesImpl implements RouteServices {
 					Thumbnail urlGenerator = new Thumbnail();
 					try {
 						route.setImgUrl(urlGenerator.getEncodedPolylineURL(gpxString));
+						
 					} catch (IOException e1) {
+						
 						e1.printStackTrace();
 					}
 					
-					
+					System.out.println(route.getImgUrl());
 					if (url != null) {
 						route.setUrl(url);
 						try {
@@ -447,5 +449,70 @@ public class RouteServicesImpl implements RouteServices {
 		}
 		return gpxString;
 
+	}
+	
+	@Override
+	@GET
+	@Path("/retrieve/lastuploaded")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getLastUploaded(){
+
+		List<Route> allRoutes = null;
+		ObjectMapper objectMapper = new ObjectMapper();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		objectMapper.setDateFormat(dateFormat);
+		String json = null;
+
+		try {
+			allRoutes = routeRep.lastUploaded();
+		} catch (Exception e) {
+			throw new UncheckedPersistenceException(
+					"Error accessing route database", e);
+		}
+		// check if allRoutes has been populated, with isEmpty -> return 404
+		if (!(allRoutes.isEmpty())) {
+
+			// set the view to return just the json fields for the visualization
+			// and exclude the default view
+			objectMapper.setConfig(objectMapper.getSerializationConfig()
+					.withView(Views.ItineraryGeneralView.class));
+			objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+
+			try {
+				json = objectMapper.writerWithView(
+						Views.ItineraryGeneralView.class).writeValueAsString(
+						allRoutes);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				
+			}
+
+			Crypter crypter = new Crypter();
+			String cryptedJson = null;
+			try {
+				cryptedJson = crypter.encrypt(json);
+			} catch (Exception e) {
+				e.printStackTrace();
+				
+			}
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("routes", cryptedJson);
+			Wrapper wrapper = new Wrapper();
+			String outputJson = null;
+
+			try {
+				outputJson = wrapper.wrap(map);
+			} catch (Exception e) {
+				e.printStackTrace();
+				
+			}
+
+			return Response.ok(outputJson, MediaType.APPLICATION_JSON).build();
+		}
+
+		else {
+			return Response.status(404).build();
+		}
+		
 	}
 }

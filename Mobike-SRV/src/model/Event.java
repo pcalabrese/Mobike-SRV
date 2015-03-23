@@ -48,6 +48,7 @@ import com.fasterxml.jackson.annotation.JsonView;
     @NamedQuery(name = "Event.findByName", query = "SELECT e FROM Event e WHERE e.name = :name"),
     @NamedQuery(name = "Event.findByStartdate", query = "SELECT e FROM Event e WHERE e.startdate = :startdate"),
     @NamedQuery(name = "Event.findByStartlocation", query = "SELECT e FROM Event e WHERE e.startlocation = :startlocation"),
+    //@NamedQuery(name = "Event.findLastUploaded", query = "SELECT E FROM Event e ORDER BY e.creationdate DESC LIMIT 6"),
     @NamedQuery(name = "Event.findByCreationdate", query = "SELECT e FROM Event e WHERE e.creationdate = :creationdate")})
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Event implements Serializable {

@@ -132,7 +132,11 @@ public class EventsServicesImpl implements EventsServices {
 		}
 
 		if (!(allEvents.isEmpty())) {
-
+			for(Event ev : allEvents){
+				ev.setAcceptedSize();
+				ev.setInvitedSize();
+				ev.setRefusedSize();
+			}
 			ObjectMapper mapper = new ObjectMapper();
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			mapper.setDateFormat(dateFormat);
@@ -216,6 +220,10 @@ public class EventsServicesImpl implements EventsServices {
 				if (!(allEvents.isEmpty())) {
 					for (Event e : allEvents) {
 						e.setUserStateByUserId(user.getId());
+						
+							e.setAcceptedSize();
+							e.setInvitedSize();
+							e.setRefusedSize();
 					}
 
 					mapper.setConfig(mapper.getSerializationConfig().withView(
@@ -287,6 +295,10 @@ public class EventsServicesImpl implements EventsServices {
 		}
 
 		if (event != null) {
+			
+				event.setAcceptedSize();
+				event.setInvitedSize();
+				event.setRefusedSize();
 
 			// set the view
 			objectMapper.setConfig(objectMapper.getSerializationConfig()
@@ -582,4 +594,66 @@ public class EventsServicesImpl implements EventsServices {
 		}
 
 	} // chiude metodo
+	
+	
+	@Override
+	@GET
+	@Path("/retrieve/lastuploaded")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response retrieveLastUploaded() {
+		List<Event> allEvents = null;
+		EventRepository eventRep = new EventMySQL();
+		try {
+			allEvents = eventRep.getLastUploaded();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		if (!(allEvents.isEmpty())) {
+			for(Event ev : allEvents){
+				ev.setAcceptedSize();
+				ev.setInvitedSize();
+				ev.setRefusedSize();
+			}
+
+			ObjectMapper mapper = new ObjectMapper();
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			mapper.setDateFormat(dateFormat);
+			mapper.setConfig(mapper.getSerializationConfig().withView(
+					Views.EventGeneralView.class));
+			mapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false);
+
+			String json = null;
+			try {
+				json = mapper.writeValueAsString(allEvents);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+
+			Crypter crypter = new Crypter();
+			String cryptedJson = null;
+			try {
+				cryptedJson = crypter.encrypt(json);
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
+
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("events", cryptedJson);
+			Wrapper wrapper = new Wrapper();
+			String jsonOutput = null;
+
+			try {
+				jsonOutput = wrapper.wrap(map);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			return Response.ok(jsonOutput, MediaType.APPLICATION_JSON).build();
+
+		} else {
+			return Response.status(404).build();
+		}
+
+	}
 }

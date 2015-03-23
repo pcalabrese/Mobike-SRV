@@ -36,6 +36,8 @@ public interface RouteServices{
 	public String getRoutegpx(Long id);
 
 	public Response retrieveAllFilteredRoutes(String startLocation, String endLocation, int minLength, int maxLength, int minDuration, int maxDuration, String type);
+
+	public Response getLastUploaded();
 	
 	
 }

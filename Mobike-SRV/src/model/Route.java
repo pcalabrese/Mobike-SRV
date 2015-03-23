@@ -56,6 +56,7 @@ import com.fasterxml.jackson.annotation.JsonView;
     @NamedQuery(name = "Route.findByRatingnumber", query = "SELECT r FROM Route r WHERE r.ratingnumber = :ratingnumber"),
     @NamedQuery(name = "Route.findByBends", query = "SELECT r FROM Route r WHERE r.bends = :bends"),
     @NamedQuery(name = "Route.findByStartlocation", query = "SELECT r FROM Route r WHERE r.startlocation = :startlocation"),
+    
     @NamedQuery(name = "Route.findByEndlocation", query = "SELECT r FROM Route r WHERE r.endlocation = :endlocation")})
 //@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Route implements Serializable {
@@ -142,7 +143,7 @@ public class Route implements Serializable {
     private String gpxString;
     
     @JsonView({Views.EventDetailView.class, Views.ItineraryGeneralView.class})
-    @Transient
+    
     private String imgUrl;
     
 
@@ -332,8 +333,14 @@ public class Route implements Serializable {
 			ratesum += r.getRate();
 			ratenum++;
 		}
+		
+		if(ratenum == 0){
+			this.rating = 0;
+			this.ratingnumber = 0;
+		}
+		else {
 		this.rating = ratesum / ratenum ;
-		this.ratingnumber = ratenum;
+		this.ratingnumber = ratenum;}
 	}
 
 	@Override

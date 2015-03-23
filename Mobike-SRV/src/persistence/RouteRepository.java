@@ -57,5 +57,7 @@ public interface RouteRepository {
 
 	void updateRates(long id);
 
+	List<Route> lastUploaded();
+
 	
 }

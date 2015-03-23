@@ -585,7 +585,7 @@ public class UserServicesImpl implements UserServices {
 	@Path("/myinvitations")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMyInvitations(String cryptedJson) {
+	public Response getMyInvitations(@QueryParam("token") String cryptedJson) {
 		if (cryptedJson != null) {
 			Authenticator auth = new Authenticator();
 			boolean exists = false;

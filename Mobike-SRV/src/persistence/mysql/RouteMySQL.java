@@ -162,10 +162,22 @@ public class RouteMySQL implements RouteRepository{
 	public void updateRates(long id){
 		em.getTransaction().begin();
 		Route route = em.find(Route.class, id);
-		
 		route.calculateRate();
 		
 		em.getTransaction().commit();
+	}
+	
+	@Override
+	@OrderBy("uploaddate DESC")
+	public List<Route> lastUploaded(){
+
+		List<Route> routes = null;
+		TypedQuery<Route> query = em.createNamedQuery("Route.findAll",Route.class);
+		query.setMaxResults(6);
+		routes = query.getResultList();
+		
+		
+		return routes;
 	}
 	
 }
