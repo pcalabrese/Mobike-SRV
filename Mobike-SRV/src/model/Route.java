@@ -107,7 +107,7 @@ public class Route implements Serializable {
     
     @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "rating")
-    private Integer rating;
+    private double rating;
 
     @JsonView(Views.ItineraryGeneralView.class)
     @Column(name = "ratingnumber")
@@ -244,11 +244,11 @@ public class Route implements Serializable {
         this.difficulty = difficulty;
     }
 
-    public Integer getRating() {
+    public double getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(double rating) {
         this.rating = rating;
     }
 
