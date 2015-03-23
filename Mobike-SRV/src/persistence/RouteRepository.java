@@ -55,5 +55,7 @@ public interface RouteRepository {
 	
 	public List<Route> searchRouteByCriteria(String startLocation, String endLocation, int minLength, int maxLength, int minDuration, int maxDuration, String type);
 
+	void updateRates(long id);
+
 	
 }

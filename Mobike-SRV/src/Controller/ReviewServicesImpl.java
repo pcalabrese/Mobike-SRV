@@ -15,9 +15,11 @@ import model.Review;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import persistence.ReviewRepository;
+import persistence.RouteRepository;
 import persistence.exception.PersistenceException;
 import persistence.exception.UncheckedPersistenceException;
 import persistence.mysql.ReviewMySQL;
+import persistence.mysql.RouteMySQL;
 import utils.Authenticator;
 import utils.Crypter;
 import utils.Wrapper;
@@ -76,6 +78,8 @@ public class ReviewServicesImpl implements ReviewServices {
 
 					try {
 						reviewRep.addReview(review);
+						RouteRepository routeRep = new RouteMySQL();
+						routeRep.updateRates(review.getReviewPK().getRoutesId());
 					} catch (PersistenceException e) {
 						e.printStackTrace();
 						throw new UncheckedPersistenceException(
@@ -141,6 +145,8 @@ public class ReviewServicesImpl implements ReviewServices {
 
 					try {
 						reviewRep.updateReview(review);
+						RouteRepository routeRep = new RouteMySQL();
+						routeRep.updateRates(review.getReviewPK().getRoutesId());
 					} catch (PersistenceException e) {
 						e.printStackTrace();
 						throw new UncheckedPersistenceException(
@@ -206,7 +212,8 @@ public class ReviewServicesImpl implements ReviewServices {
 					System.out.println(review.getReviewPK().getRoutesId() + " " + review.getReviewPK().getUsersId());
 					try {
 						reviewRep.removeReviewFromId(review.getReviewPK());
-
+						RouteRepository routeRep = new RouteMySQL();
+						routeRep.updateRates(review.getReviewPK().getRoutesId());
 					} catch (PersistenceException e) {
 						e.printStackTrace();
 						throw new UncheckedPersistenceException(

@@ -218,7 +218,7 @@ public class RouteServicesImpl implements RouteServices {
 
 			// set the gpxString in the Route bean
 			route.setGpxString(gpxString);
-
+			
 			// set the view to return just the json fields for the visualization
 			// and exclude the default view
 			objectMapper.setConfig(objectMapper.getSerializationConfig()

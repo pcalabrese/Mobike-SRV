@@ -1,8 +1,13 @@
 package persistence.mysql;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+
 import model.Review;
 import model.ReviewPK;
+import model.Route;
+import model.User;
 import persistence.ReviewRepository;
 import persistence.exception.PersistenceException;
 import persistence.jpa.SingletonEMF;
@@ -21,48 +26,52 @@ public class ReviewMySQL implements ReviewRepository {
 		Review review = null;
 		review = em.find(Review.class, id);
 		em.getTransaction().commit();
-		em.close();
 		
-
 		return review;
 	}
 
 	@Override
 	public void removeReviewFromId(ReviewPK id) throws PersistenceException {
 		em.getTransaction().begin();
-		Review review = null;
+		Review review;
 		review = em.find(Review.class, id);
+		
 		em.remove(review);	
-		review.getRoute().getReviewList().remove(review);
 		em.getTransaction().commit();
 		em.close();
 	}
-
+	
+	
 	@Override
 	public void addReview(Review r) throws PersistenceException {
 		
 		em.getTransaction().begin();
 		em.persist(r);
 		em.getTransaction().commit();
+		
+		
+		
 		em.close();
 	}
 	
 	@Override
 	public void updateReview(Review r) throws PersistenceException {
 		
-		Review review = em.find(Review.class, r.getReviewPK());
 		
 		em.getTransaction().begin();
-		
+		Review review = em.find(Review.class, r.getReviewPK());
 		review.setMessage(r.getMessage());
 		review.setRate(r.getRate());
-		
-		review.getRoute().getReviewList().remove(review);
-		review.getRoute().getReviewList().add(review);
-		
+
 		em.getTransaction().commit();
+		
+		
+		
 		em.close();
 	
 	}
+	
+	
+	
 
 }

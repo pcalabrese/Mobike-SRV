@@ -39,7 +39,7 @@ public class EventMySQL implements EventRepository{
 			event = results.get(0);
 			
 		}
-		em.close();
+		
 		return event;
 		
 	}
@@ -56,7 +56,7 @@ public class EventMySQL implements EventRepository{
 		List<Event> events = null;
 		TypedQuery<Event> query = em.createNamedQuery("Event.findAll",Event.class);
 		events = query.getResultList();
-		em.close();
+		
 		return events;
 	}
 	

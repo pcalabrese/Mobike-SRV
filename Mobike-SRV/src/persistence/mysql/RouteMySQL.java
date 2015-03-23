@@ -28,16 +28,13 @@ public class RouteMySQL implements RouteRepository{
 		query.setParameter("id",id);
 		results = query.getResultList();
 		
-		if(results==null){
-			return route;
-		}
-		else {
-			if(!(results.isEmpty()))
-				return route = results.get(0);
-			else
-				return route;
-		}
 		
+		if(results != null && !(results.isEmpty())){
+			route = results.get(0);
+			
+		}
+		return route;
+	
 	}
 
 	/* 
@@ -51,7 +48,7 @@ public class RouteMySQL implements RouteRepository{
 		TypedQuery<Route> query = em.createNamedQuery("Route.findAll",Route.class);
 		routes = query.getResultList();
 		
-		em.close();
+		
 		return routes;
 	}
 
@@ -67,7 +64,7 @@ public class RouteMySQL implements RouteRepository{
 		TypedQuery<Route> query = em.createNamedQuery("Route.findbyName",Route.class);
 		query.setParameter("name",name);
 		results = query.getResultList();
-		em.close();
+		
 		return results;
 	}
 
@@ -157,8 +154,18 @@ public class RouteMySQL implements RouteRepository{
 		
 		Query query = em.createNativeQuery(stringSQL,Route.class);
 		routes = query.getResultList();	
-		em.close();
+		
 		return routes;
+	}
+	
+	@Override
+	public void updateRates(long id){
+		em.getTransaction().begin();
+		Route route = em.find(Route.class, id);
+		
+		route.calculateRate();
+		
+		em.getTransaction().commit();
 	}
 	
 }

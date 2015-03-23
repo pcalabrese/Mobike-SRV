@@ -16,6 +16,7 @@
 			<property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
 			<property name="javax.persistence.jdbc.user" value="mobikeSRV"/>
 			<property name="javax.persistence.jdbc.password" value="m0SRV2015_pbma"/>
+			<property name="eclipselink.cache.shared.default" value="false"/>
 		</properties>
 	</persistence-unit>
 </persistence>

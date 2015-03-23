@@ -27,7 +27,7 @@ public class UserMySQL implements UserRepository {
 				"select u from User u where u.id=:id", User.class);
 		query.setParameter("id", id);
 		user = query.getSingleResult();
-		em.close();
+		
 		return user;
 	}
 	
@@ -50,7 +50,7 @@ public class UserMySQL implements UserRepository {
 		TypedQuery<User> query = em.createQuery("select u from User u",
 				User.class);
 		users = query.getResultList();
-		em.close();
+		
 		return users;
 	}
 
@@ -64,7 +64,7 @@ public class UserMySQL implements UserRepository {
 		users = query.getResultList();
 		if (!users.isEmpty())
 			user = users.get(0);
-		em.close();
+		
 		return user;
 	}
 
@@ -130,7 +130,7 @@ public class UserMySQL implements UserRepository {
 
 		if (!(query.getResultList().isEmpty()))
 			output = true;
-		em.close();
+		
 		return output;
 	}
 
@@ -147,7 +147,7 @@ public class UserMySQL implements UserRepository {
 
 		if(!(query.getResultList().isEmpty()))
 			output = true;
-		em.close();
+		
 		return output;
 
 	}

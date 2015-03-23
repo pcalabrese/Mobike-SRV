@@ -323,6 +323,18 @@ public class Route implements Serializable {
 	public void setGpxString(String gpxString) {
 		this.gpxString = gpxString;
 	}
+	
+	
+	public void calculateRate() {
+		int ratesum = 0;
+		int ratenum = 0;
+		for( Review r : this.reviewList){
+			ratesum += r.getRate();
+			ratenum++;
+		}
+		this.rating = ratesum / ratenum ;
+		this.ratingnumber = ratenum;
+	}
 
 	@Override
     public int hashCode() {
