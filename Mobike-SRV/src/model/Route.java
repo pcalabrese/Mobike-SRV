@@ -137,7 +137,7 @@ public class Route implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "route", fetch = FetchType.EAGER)
     private List<Event> eventList;
     
-    @JsonView(Views.ItineraryDetailView.class)
+    //@JsonView(Views.ItineraryDetailView.class)
     @Transient
     private String gpxString;
     
@@ -326,7 +326,7 @@ public class Route implements Serializable {
 	
 	
 	public void calculateRate() {
-		int ratesum = 0;
+		double ratesum = 0;
 		int ratenum = 0;
 		for( Review r : this.reviewList){
 			ratesum += r.getRate();

@@ -245,6 +245,7 @@ public class RouteServicesImpl implements RouteServices {
 			}
 			Map<String, String> map = new HashMap<String, String>();
 			map.put("route", cryptedJson);
+			map.put("gpx", route.getGpxString());
 
 			Wrapper wrapper = new Wrapper();
 			String outputJson = null;

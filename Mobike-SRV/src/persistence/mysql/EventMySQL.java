@@ -9,7 +9,6 @@ import persistence.EventRepository;
 import javax.persistence.*;
 
 import persistence.exception.PersistenceException;
-
 import persistence.jpa.SingletonEMF;
 
 
@@ -133,6 +132,7 @@ public class EventMySQL implements EventRepository{
 	@Override
 	public void updateEvent(Event e) throws PersistenceException {
 		
+		@SuppressWarnings("unused")
 		Event event = em.find(Event.class, e.getId());
 		
 		em.getTransaction().begin();

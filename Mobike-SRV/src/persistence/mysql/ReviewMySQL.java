@@ -1,13 +1,10 @@
 package persistence.mysql;
-import java.util.List;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-
 import model.Review;
 import model.ReviewPK;
-import model.Route;
-import model.User;
 import persistence.ReviewRepository;
 import persistence.exception.PersistenceException;
 import persistence.jpa.SingletonEMF;
