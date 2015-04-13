@@ -465,6 +465,13 @@ public class UserServicesImpl implements UserServices {
 				}
 
 				if (myevents != null) {
+					
+					for(Event e: myevents){
+						e.setAcceptedSize();
+						e.setInvitedSize();
+						e.setRefusedSize();
+					}
+					
 					Map<String, String> map = new HashMap<String, String>();
 					mapper.setConfig(mapper.getSerializationConfig().withView(
 							Views.EventGeneralView.class));
@@ -603,10 +610,10 @@ public class UserServicesImpl implements UserServices {
 				mapper.setDateFormat(dateFormat);
 				Crypter crypter = new Crypter();
 				List<Event> myeventsInv = null;
+				long userid = -1;
 
 				try {
-					long userid = mapper.readValue(
-							crypter.decrypt(cryptedJson), User.class).getId();
+					 userid = mapper.readValue(crypter.decrypt(cryptedJson), User.class).getId();
 
 					myeventsInv = userRep.userFromId(userid).getEventsInvited();
 				} catch (Exception e) {
@@ -614,6 +621,16 @@ public class UserServicesImpl implements UserServices {
 				}
 
 				if (myeventsInv != null) {
+					
+					
+					for(Event e: myeventsInv){
+						e.setUserStateByUserId(userid);
+						
+						e.setAcceptedSize();
+						e.setInvitedSize();
+						e.setRefusedSize();
+					}
+					
 					Map<String, String> map = new HashMap<String, String>();
 					mapper.setConfig(mapper.getSerializationConfig().withView(
 							Views.EventGeneralView.class));
