@@ -2,7 +2,7 @@
     <wb-module deploy-name="Mobike-SRV">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="Mobike-SRV"/>
         <property name="java-output-path" value="/Mobike-SRV/build/classes"/>
+        <property name="context-root" value="SRV"/>
     </wb-module>
 </project-modules>
