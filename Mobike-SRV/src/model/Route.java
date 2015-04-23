@@ -21,6 +21,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -32,6 +33,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
 import com.fasterxml.jackson.annotation.JsonView;
 
 
@@ -144,6 +146,10 @@ public class Route implements Serializable {
     
     @JsonView({Views.EventDetailView.class, Views.ItineraryGeneralView.class})
     private String imgUrl;
+    
+    @JsonView(Views.ItineraryDetailView.class)
+    @ManyToMany(mappedBy= "routesAssociated", fetch = FetchType.EAGER)
+    private List<Poi> poisList;
     
 
     /**
@@ -325,6 +331,20 @@ public class Route implements Serializable {
 	}
 	
 	
+	/**
+	 * @return the poisList
+	 */
+	public List<Poi> getPoisList() {
+		return poisList;
+	}
+
+	/**
+	 * @param poisList the poisList to set
+	 */
+	public void setPoisList(List<Poi> poisList) {
+		this.poisList = poisList;
+	}
+
 	public void calculateRate() {
 		double ratesum = 0;
 		int ratenum = 0;

@@ -127,6 +127,10 @@ public class User implements Serializable {
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private List<Review> reviewList;
+    
+    @JsonView(Views.UserDetailView.class)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
+    private List<Poi> poisList;
 
     public User() {
     }
@@ -289,7 +293,21 @@ public class User implements Serializable {
         this.eventsOwned = eventsOwned;
     }
 
-    @Override
+    /**
+	 * @return the poisList
+	 */
+	public List<Poi> getPoisList() {
+		return poisList;
+	}
+
+	/**
+	 * @param poisList the poisList to set
+	 */
+	public void setPoisList(List<Poi> poisList) {
+		this.poisList = poisList;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

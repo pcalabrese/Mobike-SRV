@@ -8,6 +8,7 @@
     	<class>model.Event</class>
     	<class>model.Route</class>
     	<class>model.User</class>
+    	<class>model.Poi</class>
     	
 		
 		<properties>

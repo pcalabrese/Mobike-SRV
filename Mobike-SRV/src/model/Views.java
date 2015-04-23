@@ -16,5 +16,9 @@ public class Views {
 	
 	public interface UserDetailView extends UserEventRouteView { } 
 	
+	public interface PoiGeneralView { }
+	
+	public interface PoiDetailView extends PoiGeneralView { }
+	
 	
 }
