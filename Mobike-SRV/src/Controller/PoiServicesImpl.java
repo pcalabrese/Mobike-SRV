@@ -1,9 +1,11 @@
 package Controller;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -11,11 +13,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import model.Poi;
 import model.Views;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import persistence.PoiRepository;
 import persistence.exception.PersistenceException;
 import persistence.exception.UncheckedPersistenceException;
@@ -58,8 +63,8 @@ public class PoiServicesImpl implements PoiServices {
 				List<Poi> pois = null;
 
 				try {
-					pois = (List<Poi>) mapper.readValue(
-							crypter.decrypt(map.get("pois")), List.class);
+					
+					pois = Arrays.asList(mapper.readValue(crypter.decrypt(map.get("pois")), Poi[].class));
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -68,6 +73,7 @@ public class PoiServicesImpl implements PoiServices {
 				try {
 					boolean check = true;
 					for(int i = 0; i< pois.size() && check;i++){
+						
 					authorized = auth.isAuthorized(pois.get(i).getOwner().getId(), map.get("user"));
 					check = authorized;
 					}
