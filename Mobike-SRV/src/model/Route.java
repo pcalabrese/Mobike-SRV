@@ -84,6 +84,7 @@ public class Route implements Serializable {
     
     
     @Column(name = "url")
+    @JsonView(Views.ItineraryDetailView.class)
     private String url;
     
     
