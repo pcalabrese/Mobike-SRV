@@ -20,12 +20,12 @@ public class GpxIO implements RouteIO{
 		String filepath = null;
 		try {
  
-			File file = new File("C:/gpxs/"+filename+".gpx");
+			File file = new File("C:/downloads/gpxs/"+filename+".gpx");
 			int i=0;
 			
 			/* to prevent file overwriting */
 			while(file.exists()){
-				file = new File("C:/gpxs/"+filename+i+".gpx");
+				file = new File("C:/downloads/gpxs/"+filename+i+".gpx");
 				i++;
 			}
  
@@ -53,7 +53,7 @@ public class GpxIO implements RouteIO{
 	public String read(String filename) throws FilesystemException {
 		BufferedReader br;
 		try {
-			br = new BufferedReader(new FileReader("C:/gpxs/"+filename));
+			br = new BufferedReader(new FileReader("C:/downloads/gpxs/"+filename));
 		} 
 		catch (FileNotFoundException e) {
 			throw new FilesystemException(e.getMessage());

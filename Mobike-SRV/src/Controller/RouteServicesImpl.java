@@ -85,7 +85,7 @@ public class RouteServicesImpl implements RouteServices {
 		}
 
 		if (map != null) {
-
+			
 			if (map.containsKey("route") & map.containsKey("user")) {
 
 				Authenticator auth = new Authenticator();
@@ -215,7 +215,7 @@ public class RouteServicesImpl implements RouteServices {
 		if (route != null) {
 			// take gpxString from file on server
 			try {
-				gpxString = fsrepo.read(route.getUrl().substring(8));
+				gpxString = fsrepo.read(route.getUrl().substring(17));
 			} catch (Exception e) {
 				throw new UncheckedFilesystemException(
 						"Error reading gpx file", e);
@@ -445,7 +445,7 @@ public class RouteServicesImpl implements RouteServices {
 					"Error accessing route database", e);
 		}
 		try {
-			gpxString = fsrepo.read(r.getUrl().substring(8));
+			gpxString = fsrepo.read(r.getUrl().substring(17));
 
 		} catch (Exception e) {
 			throw new UncheckedFilesystemException("Error reading gpx file", e);
