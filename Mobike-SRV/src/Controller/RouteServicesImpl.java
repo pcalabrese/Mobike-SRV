@@ -215,7 +215,7 @@ public class RouteServicesImpl implements RouteServices {
 		if (route != null) {
 			// take gpxString from file on server
 			try {
-				gpxString = fsrepo.read(route.getUrl().substring(17));
+				gpxString = fsrepo.read(route.getUrl().substring(18));
 			} catch (Exception e) {
 				throw new UncheckedFilesystemException(
 						"Error reading gpx file", e);
@@ -223,7 +223,7 @@ public class RouteServicesImpl implements RouteServices {
 
 			// set the gpxString in the Route bean
 			route.setGpxString(gpxString);
-			route.setUrl(route.getUrl().substring(17));
+			route.setUrl(route.getUrl().substring(18));
 			
 			// set the view to return just the json fields for the visualization
 			// and exclude the default view
