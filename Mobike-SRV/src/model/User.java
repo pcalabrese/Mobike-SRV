@@ -86,6 +86,7 @@ public class User implements Serializable {
     
     
     @Lob
+    @JsonView(Views.UserDetailView.class)
     @Column(name = "imgurl")
     private String imgurl;
     
