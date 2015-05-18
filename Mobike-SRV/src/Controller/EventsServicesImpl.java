@@ -532,11 +532,9 @@ public class EventsServicesImpl implements EventsServices {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				System.out.println(op.equals("accept"));
 				boolean ok = false;
 				if (u2 != null && e2 != null) {
 					if (op.equals("accept")) {
-						System.out.println("entered accept");
 						if (e2.getUsersInvited().contains(u2)) {
 							ok = true;
 							e2.getUsersAccepted().add(u2);
@@ -572,7 +570,7 @@ public class EventsServicesImpl implements EventsServices {
 
 						return Response.ok().build();
 					} else {
-						System.out.println("1");
+						
 						return Response.status(400).build();
 					}
 
@@ -583,13 +581,13 @@ public class EventsServicesImpl implements EventsServices {
 
 			} // map.get("event") e get("user") ==null
 			else {
-				System.out.println("2");
+				
 				return Response.status(400).build();
 			}
 
 		} // map==null
 		else {
-			System.out.println("3");
+			
 			return Response.status(400).build();
 		}
 
